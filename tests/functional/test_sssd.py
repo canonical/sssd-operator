@@ -6,7 +6,7 @@
 
 import unittest
 
-import sssd
+from utils import sssd
 
 
 class TestSSSDCharm(unittest.TestCase):

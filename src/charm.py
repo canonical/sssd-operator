@@ -6,8 +6,11 @@
 
 import logging
 
-import sssd
-from ldapclient_lib import (
+from ops.charm import CharmBase
+from ops.main import main
+from ops.model import ActiveStatus, BlockedStatus
+from utils import sssd
+from utils.ldapclient_lib import (
     CertificateAvailableEvent,
     CertificateUnavailableEvent,
     ConfigDataAvailableEvent,
@@ -15,9 +18,6 @@ from ldapclient_lib import (
     LdapReadyEvent,
     ServerUnavailableEvent,
 )
-from ops.charm import CharmBase
-from ops.main import main
-from ops.model import ActiveStatus, BlockedStatus
 
 logger = logging.getLogger(__name__)
 
