@@ -11,7 +11,7 @@ import subprocess
 
 from charms.operator_libs_linux.v0 import apt
 from charms.operator_libs_linux.v1 import systemd
-from jinja2 import Template
+from jinja2 import Environment, FileSystemLoader
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +119,8 @@ def save_conf(
 ) -> None:
     """Save sssd conf.
 
+    sssd.conf file is generated from a pre-defined Jinja template.
+
     Args:
         basedn:   Default base DN.
         domain:   Domain name.
@@ -127,17 +129,16 @@ def save_conf(
         ldap_password: Password passed from secret.
     """
     sssd_conf_path = "/etc/sssd/conf.d/sssd.conf"
-    # Write contents to config file
-    template = Template(pathlib.Path("templates/sssd.toml.j2").read_text())
-    rendered = template.render(
+    environment = Environment(loader=FileSystemLoader("src/templates"))
+    template = environment.get_template("sssd.conf.j2")
+    sssd_conf = template.render(
         basedn=basedn,
         domain=domain,
         ldap_uri=ldap_uri,
         ldap_default_bind_dn=ldap_default_bind_dn,
         ldap_password=ldap_password,
     )
-    pathlib.Path(sssd_conf_path).write_text(rendered)
-    # Change file ownership and permissions
+    pathlib.Path(sssd_conf_path).write_text(sssd_conf)
     os.chown(sssd_conf_path, 0, 0)
     os.chmod(sssd_conf_path, 0o600)
 
