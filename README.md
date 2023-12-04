@@ -1,5 +1,7 @@
 # sssd-operator
 
+[![CharmHub Badge](https://charmhub.io/sssd/badge.svg)](https://charmhub.io/sssd)
+
 Charmhub package name: sssd-operator
 More information: https://charmhub.io/sssd-operator
 
