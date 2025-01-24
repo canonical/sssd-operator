@@ -2,7 +2,7 @@
 # Copyright 2023 Canonical Ltd.
 # See LICENSE file for licensing details.
 
-"""Test sssd charm."""
+"""Integration tests for sssd charm."""
 
 import asyncio
 
@@ -10,35 +10,38 @@ import pytest
 from pytest_operator.plugin import OpsTest
 
 SSSD = "sssd"
-SERIES = ["jammy"]
+BASE = ["ubuntu@24.04"]
 UBUNTU = "ubuntu"
 
 
 @pytest.mark.abort_on_fail
-@pytest.mark.parametrize("series", SERIES)
+@pytest.mark.parametrize("base", BASE)
 @pytest.mark.skip_if_deployed
-async def test_deploy(ops_test: OpsTest, series: str, sssd_charm):
-    """Test sssd charm deployment."""
+async def test_build_and_deploy(ops_test: OpsTest, base: str, sssd_charm) -> None:
+    """Test building and deploying the sssd charm."""
     await asyncio.gather(
-        # Build and Deploy sssd
         ops_test.model.deploy(
             str(await sssd_charm),
             application_name=SSSD,
-            num_units=None,
-            series=series,
+            num_units=0,
+            base=base,
         ),
         ops_test.model.deploy(
             UBUNTU,
-            channel="edge",
+            channel="latest/stable",
             application_name=UBUNTU,
             num_units=1,
-            series=series,
+            base=base,
         ),
     )
-    # Add Ubuntu integration to SSSD
+
     await ops_test.model.integrate(SSSD, UBUNTU)
 
-    # issuing update_status just to trigger an event
+    # Assert that sssd is waiting to be connected to an ldap provider.
     async with ops_test.fast_forward():
-        await ops_test.model.wait_for_idle(apps=[SSSD], status="active", timeout=1000)
-        assert ops_test.model.applications[SSSD].units[0].workload_status == "active"
+        await ops_test.model.wait_for_idle(apps=[SSSD], status="waiting", timeout=1000)
+        assert ops_test.model.applications[SSSD].units[0].workload_status == "waiting"
+        assert (
+            ops_test.model.applications[SSSD].units[0].workload_status_message
+            == "Waiting for integrations: [`ldap`]"
+        )
