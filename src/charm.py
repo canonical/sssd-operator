@@ -71,7 +71,7 @@ class SSSDCharm(ops.CharmBase):
     @refresh
     def _on_install(self, event: ops.InstallEvent) -> None:
         """Handle when sssd charm is installed on unit."""
-        self.unit.status = ops.MaintenanceStatus("Installing SSSD...")
+        self.unit.status = ops.MaintenanceStatus("Installing SSSD")
         try:
             sssd.install()
             self.unit.set_workload_version(sssd.version())
@@ -84,9 +84,9 @@ class SSSDCharm(ops.CharmBase):
 
     def _on_stop(self, _: ops.StopEvent) -> None:
         """Handle when sssd unit is going to be torn down by Juju."""
-        self.unit.status = ops.MaintenanceStatus("Disabling SSSD...")
+        self.unit.status = ops.MaintenanceStatus("Disabling SSSD")
         sssd.disable()
-        self.unit.status = ops.MaintenanceStatus("Removing SSSD...")
+        self.unit.status = ops.MaintenanceStatus("Removing SSSD")
         sssd.remove()
         self.unit.status = ops.MaintenanceStatus("SSSD removed")
 
@@ -121,22 +121,22 @@ class SSSDCharm(ops.CharmBase):
 
         if name not in domains:
             self.unit.status = ops.MaintenanceStatus(
-                f"Adding domain `{name}` to SSSD configuration..."
+                f"Adding domain `{name}` to SSSD configuration"
             )
             sssd.add_ldap_domain(name, data)
         else:
             self.unit.status = ops.MaintenanceStatus(
-                f"Updating domain `{name}` in SSSD configuration..."
+                f"Updating domain `{name}` in SSSD configuration"
             )
             sssd.update_ldap_domain(name, data)
 
         if len(domains) == 0:
             logger.info("first domain added to sssd configuration. enabling sssd service")
-            self.unit.status = ops.MaintenanceStatus("Enabling SSSD...")
+            self.unit.status = ops.MaintenanceStatus("Enabling SSSD")
             sssd.enable()
         else:
             logger.info("sssd configuration has been updated. restarting sssd service")
-            self.unit.status = ops.MaintenanceStatus("Restarting SSSD...")
+            self.unit.status = ops.MaintenanceStatus("Restarting SSSD")
             sssd.restart()
 
     @refresh
@@ -146,17 +146,17 @@ class SSSDCharm(ops.CharmBase):
         sssd.remove_ldap_domain(domain)
         if domains := sssd.domains():
             logger.info("restarting sssd service with configured domains %s", domains)
-            self.unit.status = ops.MaintenanceStatus("Restarting SSSD...")
+            self.unit.status = ops.MaintenanceStatus("Restarting SSSD")
             sssd.restart()
         else:
             logger.info("no domains exist in sssd configuration. disabling sssd service")
-            self.unit.status = ops.MaintenanceStatus("Disabling SSSD...")
+            self.unit.status = ops.MaintenanceStatus("Disabling SSSD")
             sssd.disable()
 
     @refresh
     def _on_certificate_available(self, event: CertificateAvailableEvent):
         """Handle `CertificateAvailableEvent`."""
-        self.unit.status = ops.MaintenanceStatus("Adding new TLS certificates...")
+        self.unit.status = ops.MaintenanceStatus("Adding new TLS certificates")
         try:
             sssd.add_tls_certs(event.relation_id, event.chain)
         except sssd.SSSDOpsError as e:
@@ -170,7 +170,7 @@ class SSSDCharm(ops.CharmBase):
     @refresh
     def _on_certificate_removed(self, event: CertificateRemovedEvent) -> None:
         """Handle certificate-unavailable event."""
-        self.unit.status = ops.MaintenanceStatus("Removing stale TLS certificates...")
+        self.unit.status = ops.MaintenanceStatus("Removing stale TLS certificates")
         try:
             sssd.remove_tls_certs(event.relation_id)
         except sssd.SSSDOpsError as e:
