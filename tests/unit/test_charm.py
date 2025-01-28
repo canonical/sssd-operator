@@ -50,7 +50,7 @@ class TestCharm(unittest.TestCase):
             )
             self.assertEqual(len(state.deferred), 0)
             self.assertListEqual(
-                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Installing SSSD...")]
+                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Installing SSSD")]
             )
             mock_sssd.install.assert_called_once()
 
@@ -67,7 +67,7 @@ class TestCharm(unittest.TestCase):
             self.assertEqual(len(state.deferred), 1)
             self.assertEqual(state.deferred[0].name, "install")
             self.assertListEqual(
-                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Installing SSSD...")]
+                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Installing SSSD")]
             )
 
     @reset_mock_sssd_module
@@ -79,8 +79,8 @@ class TestCharm(unittest.TestCase):
             self.assertListEqual(
                 self.ctx.unit_status_history[1:],
                 [
-                    ops.MaintenanceStatus("Disabling SSSD..."),
-                    ops.MaintenanceStatus("Removing SSSD..."),
+                    ops.MaintenanceStatus("Disabling SSSD"),
+                    ops.MaintenanceStatus("Removing SSSD"),
                 ],
             )
             mock_sssd.disable.assert_called_once()
@@ -153,9 +153,9 @@ class TestCharm(unittest.TestCase):
                 self.ctx.unit_status_history[1:],
                 [
                     ops.MaintenanceStatus(
-                        f"Adding domain `{ldap_remote_app_name}` to SSSD configuration..."
+                        f"Adding domain `{ldap_remote_app_name}` to SSSD configuration"
                     ),
-                    ops.MaintenanceStatus("Enabling SSSD..."),
+                    ops.MaintenanceStatus("Enabling SSSD"),
                 ],
             )
             mock_sssd.add_ldap_domain.assert_called_once_with(
@@ -187,9 +187,9 @@ class TestCharm(unittest.TestCase):
                 self.ctx.unit_status_history[1:],
                 [
                     ops.MaintenanceStatus(
-                        f"Updating domain `{ldap_remote_app_name}` in SSSD configuration..."
+                        f"Updating domain `{ldap_remote_app_name}` in SSSD configuration"
                     ),
-                    ops.MaintenanceStatus("Restarting SSSD..."),
+                    ops.MaintenanceStatus("Restarting SSSD"),
                 ],
             )
             mock_sssd.add_ldap_domain.assert_not_called()
@@ -227,7 +227,7 @@ class TestCharm(unittest.TestCase):
             state = manager.run()
             self.assertEqual(state.unit_status, ops.ActiveStatus())
             self.assertListEqual(
-                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Restarting SSSD...")]
+                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Restarting SSSD")]
             )
             mock_sssd.remove_ldap_domain.assert_called_once_with("glauth")
             mock_sssd.disable.assert_not_called()
@@ -250,7 +250,7 @@ class TestCharm(unittest.TestCase):
                 ops.WaitingStatus(f"Waiting for integrations: [`{LDAP_INTEGRATION_NAME}`]"),
             )
             self.assertListEqual(
-                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Disabling SSSD...")]
+                self.ctx.unit_status_history[1:], [ops.MaintenanceStatus("Disabling SSSD")]
             )
             mock_sssd.remove_ldap_domain.assert_called_once_with("glauth")
             mock_sssd.disable.assert_called_once()
@@ -285,7 +285,7 @@ class TestCharm(unittest.TestCase):
             )
             self.assertListEqual(
                 self.ctx.unit_status_history[1:],
-                [ops.MaintenanceStatus("Adding new TLS certificates...")],
+                [ops.MaintenanceStatus("Adding new TLS certificates")],
             )
 
         # Test when `certificate_available` hook fails to add new certificates.
@@ -305,7 +305,7 @@ class TestCharm(unittest.TestCase):
             )
             self.assertListEqual(
                 self.ctx.unit_status_history[1:],
-                [ops.MaintenanceStatus("Adding new TLS certificates...")],
+                [ops.MaintenanceStatus("Adding new TLS certificates")],
             )
 
     @reset_mock_sssd_module
@@ -329,7 +329,7 @@ class TestCharm(unittest.TestCase):
             mock_sssd.remove_tls_certs.assert_called_once_with(24)
             self.assertListEqual(
                 self.ctx.unit_status_history[1:],
-                [ops.MaintenanceStatus("Removing stale TLS certificates...")],
+                [ops.MaintenanceStatus("Removing stale TLS certificates")],
             )
 
         # Test when `certificate_unavailable` hook fails to remove stale certificates.
@@ -349,7 +349,7 @@ class TestCharm(unittest.TestCase):
             )
             self.assertListEqual(
                 self.ctx.unit_status_history[1:],
-                [ops.MaintenanceStatus("Removing stale TLS certificates...")],
+                [ops.MaintenanceStatus("Removing stale TLS certificates")],
             )
 
     @reset_mock_sssd_module
