@@ -23,6 +23,5 @@ resource "juju_application" "sssd" {
     revision = var.revision
   }
 
-  constraints = var.constraints
-  units       = 0
+  units = 0
 }

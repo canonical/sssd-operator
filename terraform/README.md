@@ -22,7 +22,6 @@ This module offers the following configurable units:
 | `app_name`    | string      | Application name                                         | sssd         |          |
 | `base`        | string      | Base version to use for deployed machine                 | ubuntu@24.04 |          |
 | `channel`     | string      | Channel that charm is deployed from                      | latest/edge  |          |
-| `constraints` | string      | Constraints for the charm deployment                     | "arch=amd64" |          |
 | `model_name`  | string      | Name of the model to deploy the charm to                 |              |    Y     |
 | `revision`    | number      | Revision number of charm to deploy                       | null         |          |
 
