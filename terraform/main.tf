@@ -22,6 +22,4 @@ resource "juju_application" "sssd" {
     channel  = var.channel
     revision = var.revision
   }
-
-  units = 0
 }
