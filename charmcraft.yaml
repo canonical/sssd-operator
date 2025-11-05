@@ -35,10 +35,11 @@ platforms:
   amd64:
 
 parts:
-  charm:
-    charm-binary-python-packages:
-      - jsonschema
-      - pydantic
+  sssd:
+    source: .
+    plugin: uv
+    build-snaps:
+      - astral-uv
 
 requires:
   juju-info:

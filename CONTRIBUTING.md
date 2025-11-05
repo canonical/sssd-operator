@@ -2,24 +2,23 @@
 
 To make contributions to this charm, you'll need a working [development setup](https://juju.is/docs/sdk/dev-setup).
 
-You can use the environments created by `tox` for development:
+You can create a development environment using `just`:
 
 ```shell
-tox --notest -e unit
-source .tox/unit/bin/activate
+just env
+source .venv/bin/activate
 ```
 
 ## Testing
 
-This project uses `tox` for managing test environments. There are some pre-configured environments
+This project uses `just` for managing development tasks. There are some pre-configured recipes
 that can be used for linting and formatting code when you're preparing contributions to the charm:
 
 ```shell
-tox -e fmt           # update your code according to linting rules
-tox -e lint          # code style
-tox -e unit          # unit tests
-tox -e integration   # integration tests
-tox                  # runs 'lint' and 'unit' environments
+just fmt           # update your code according to linting rules
+just lint          # code style
+just unit          # unit tests
+just integration   # integration tests
 ```
 
 ## Build the charm
