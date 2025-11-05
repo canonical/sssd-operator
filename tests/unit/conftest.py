@@ -23,13 +23,6 @@ from ops import testing
 from pyfakefs.helpers import set_gid, set_uid
 
 import sssd
-from charm import SSSDCharm
-
-
-@pytest.fixture(scope="function")
-def mock_charm() -> testing.Context[SSSDCharm]:
-    """Mock `SSSDCharm`."""
-    return testing.Context(SSSDCharm)
 
 
 @pytest.fixture(scope="function")
@@ -68,6 +61,13 @@ def mock_sssd(monkeypatch):
     importlib.reload(charm_module)
     
     return mock_module
+
+
+@pytest.fixture(scope="function")
+def mock_charm(mock_sssd):
+    """Mock `SSSDCharm` - depends on mock_sssd to ensure charm uses mocked module."""
+    from charm import SSSDCharm
+    return testing.Context(SSSDCharm)
 
 
 @pytest.fixture(scope="function")
