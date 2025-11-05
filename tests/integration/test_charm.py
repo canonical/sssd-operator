@@ -1,47 +1,46 @@
 #!/usr/bin/env python3
-# Copyright 2023 Canonical Ltd.
+# Copyright 2023-2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
 """Integration tests for sssd charm."""
 
-import asyncio
-
+import jubilant
 import pytest
-from pytest_operator.plugin import OpsTest
 
-SSSD = "sssd"
-BASE = ["ubuntu@24.04"]
-UBUNTU = "ubuntu"
+from constants import SSSD_APP_NAME, UBUNTU_APP_NAME
 
 
-@pytest.mark.abort_on_fail
-@pytest.mark.parametrize("base", BASE)
-@pytest.mark.skip_if_deployed
-async def test_build_and_deploy(ops_test: OpsTest, base: str, sssd_charm) -> None:
+@pytest.mark.order(1)
+@pytest.mark.parametrize("base", ["ubuntu@24.04"])
+def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd) -> None:
     """Test building and deploying the sssd charm."""
-    await asyncio.gather(
-        ops_test.model.deploy(
-            str(await sssd_charm),
-            application_name=SSSD,
-            num_units=0,
-            base=base,
-        ),
-        ops_test.model.deploy(
-            UBUNTU,
-            channel="latest/stable",
-            application_name=UBUNTU,
-            num_units=1,
-            base=base,
-        ),
+    # Deploy sssd charm (subordinate charm with 0 units)
+    juju.deploy(
+        sssd,
+        SSSD_APP_NAME,
+        base=base,
     )
 
-    await ops_test.model.integrate(SSSD, UBUNTU)
+    # Deploy ubuntu charm as principal
+    juju.deploy(
+        UBUNTU_APP_NAME,
+        UBUNTU_APP_NAME,
+        channel="latest/stable",
+        base=base,
+        num_units=1,
+    )
 
-    # Assert that sssd is waiting to be connected to an ldap provider.
-    async with ops_test.fast_forward():
-        await ops_test.model.wait_for_idle(apps=[SSSD], status="waiting", timeout=1000)
-        assert ops_test.model.applications[SSSD].units[0].workload_status == "waiting"
-        assert (
-            ops_test.model.applications[SSSD].units[0].workload_status_message
-            == "Waiting for integrations: [`ldap`]"
+    # Integrate sssd with ubuntu
+    juju.integrate(SSSD_APP_NAME, UBUNTU_APP_NAME)
+
+    # Wait for sssd to reach waiting status (waiting for ldap integration)
+    juju.wait(
+        lambda status: (
+            status.applications.get(SSSD_APP_NAME)
+            and status.applications[SSSD_APP_NAME].units
+            and len(status.applications[SSSD_APP_NAME].units) > 0
+            and list(status.applications[SSSD_APP_NAME].units.values())[0].workload_status.status == "waiting"
+            and list(status.applications[SSSD_APP_NAME].units.values())[0].workload_status.message == "Waiting for integrations: [`ldap`]"
         )
+    )
+
