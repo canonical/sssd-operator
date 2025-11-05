@@ -11,7 +11,6 @@ from constants import SSSD_APP_NAME, UBUNTU_APP_NAME
 
 
 @pytest.mark.order(1)
-@pytest.mark.parametrize("base", ["ubuntu@24.04"])
 def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd) -> None:
     """Test building and deploying the sssd charm."""
     # Deploy sssd charm (subordinate charm)
