@@ -19,7 +19,7 @@ juju deploy sssd --channel edge
 juju integrate sssd ubuntu
 ```
 
-The SSSD operator can integrate with the [glauth-k8s-operator](https://github.com/canonical/glauth-k8s-operator) over the ldap integration. If the glauth-k8s operator is deployed properly, then the principal charm SSSD is integrated with will be provided LDAP services by GLAuth:
+The SSSD operator can integrate with the [glauth-k8s-operator](https://github.com/canonical/glauth-k8s-operator) over the `ldap` integration. If the glauth-k8s operator is deployed properly, then the principal charm SSSD is integrated with will be provided LDAP services by GLAuth:
 
 ```shell
 juju integrate glauth-k8s:ldap sssd:ldap
