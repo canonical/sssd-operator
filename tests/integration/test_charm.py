@@ -4,6 +4,8 @@
 
 """Integration tests for sssd charm."""
 
+from pathlib import Path
+
 import jubilant
 import pytest
 
@@ -11,13 +13,14 @@ from constants import SSSD_APP_NAME, UBUNTU_APP_NAME
 
 
 @pytest.mark.order(1)
-def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd) -> None:
+def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd: Path) -> None:
     """Test building and deploying the sssd charm."""
     # Deploy sssd charm (subordinate charm)
     juju.deploy(
         sssd,
         SSSD_APP_NAME,
         base=base,
+        num_units=0,
     )
 
     # Deploy ubuntu charm as principal
