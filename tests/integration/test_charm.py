@@ -22,7 +22,7 @@ def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd) -> None:
 
     # Deploy ubuntu charm as principal
     juju.deploy(
-        UBUNTU_APP_NAME,
+        "ubuntu",
         UBUNTU_APP_NAME,
         channel="latest/stable",
         base=base,

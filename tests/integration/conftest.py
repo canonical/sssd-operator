@@ -6,6 +6,7 @@
 
 import logging
 import os
+import subprocess
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -53,8 +54,6 @@ def sssd() -> Path:
 
     logger.info("building `sssd` charm locally")
     # Build the charm using charmcraft
-    import subprocess
-
     subprocess.run(["charmcraft", "pack"], check=True)
     # Find the built charm file
     charm_files = list(Path(".").glob("sssd_*.charm"))
