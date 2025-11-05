@@ -14,7 +14,7 @@ from constants import SSSD_APP_NAME, UBUNTU_APP_NAME
 @pytest.mark.parametrize("base", ["ubuntu@24.04"])
 def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd) -> None:
     """Test building and deploying the sssd charm."""
-    # Deploy sssd charm (subordinate charm with 0 units)
+    # Deploy sssd charm (subordinate charm)
     juju.deploy(
         sssd,
         SSSD_APP_NAME,
@@ -33,14 +33,28 @@ def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd) -> None:
     # Integrate sssd with ubuntu
     juju.integrate(SSSD_APP_NAME, UBUNTU_APP_NAME)
 
-    # Wait for sssd to reach waiting status (waiting for ldap integration)
-    juju.wait(
-        lambda status: (
-            status.applications.get(SSSD_APP_NAME)
-            and status.applications[SSSD_APP_NAME].units
-            and len(status.applications[SSSD_APP_NAME].units) > 0
-            and list(status.applications[SSSD_APP_NAME].units.values())[0].workload_status.status == "waiting"
-            and list(status.applications[SSSD_APP_NAME].units.values())[0].workload_status.message == "Waiting for integrations: [`ldap`]"
+    # Wait for sssd subordinate to reach waiting status (waiting for ldap integration)
+    # For subordinate charms, the unit appears under the principal's subordinates
+    def check_sssd_waiting(status: jubilant.Status) -> bool:
+        """Check if sssd subordinate is in waiting state with correct message."""
+        if UBUNTU_APP_NAME not in status.apps:
+            return False
+        ubuntu_app = status.apps[UBUNTU_APP_NAME]
+        if not ubuntu_app.units:
+            return False
+        # Get the first ubuntu unit
+        ubuntu_unit = list(ubuntu_app.units.values())[0]
+        # Check if sssd subordinate exists
+        sssd_unit_name = f"{SSSD_APP_NAME}/0"
+        if sssd_unit_name not in ubuntu_unit.subordinates:
+            return False
+        sssd_unit = ubuntu_unit.subordinates[sssd_unit_name]
+        # Check status and message
+        return (
+            sssd_unit.workload_status.current == "waiting"
+            and sssd_unit.workload_status.message == "Waiting for integrations: [`ldap`]"
         )
-    )
+
+    juju.wait(check_sssd_waiting)
+
 

@@ -38,7 +38,7 @@ def base(request: pytest.FixtureRequest) -> str:
 
 
 @pytest.fixture(scope="module")
-def sssd() -> Path | str:
+def sssd() -> Path:
     """Get `sssd` charm to use for integration tests.
 
     If the `LOCAL_SSSD` environment variable is not set,
@@ -47,19 +47,20 @@ def sssd() -> Path | str:
     Returns:
         `Path` object pointing to the locally built charm.
     """
-    if not LOCAL_SSSD:
-        logger.info("building `sssd` charm locally")
-        # Build the charm using charmcraft
-        import subprocess
-        subprocess.run(["charmcraft", "pack"], check=True)
-        # Find the built charm file
-        charm_files = list(Path(".").glob("sssd_*.charm"))
-        if not charm_files:
-            raise RuntimeError("Failed to build sssd charm")
-        return charm_files[0]
+    if LOCAL_SSSD:
+        logger.info("using local `sssd` charm located at %s", LOCAL_SSSD)
+        return LOCAL_SSSD
 
-    logger.info("using local `sssd` charm located at %s", LOCAL_SSSD)
-    return LOCAL_SSSD
+    logger.info("building `sssd` charm locally")
+    # Build the charm using charmcraft
+    import subprocess
+
+    subprocess.run(["charmcraft", "pack"], check=True)
+    # Find the built charm file
+    charm_files = list(Path(".").glob("sssd_*.charm"))
+    if not charm_files:
+        raise RuntimeError("Failed to build sssd charm")
+    return charm_files[0]
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
