@@ -37,19 +37,20 @@ further resources for you to explore:
 
 ## 🛠️ Development
 
-This project uses [tox](https://tox.wiki) for development. You can install it with:
+This project uses [uv](https://docs.astral.sh/uv/) and [just](https://just.systems) for development. You can install them with:
 
 ```shell
-pip install tox
+sudo snap install astral-uv --classic
+sudo snap install just --classic
 ```
 
 The project provides several useful commands that will help you while hacking on the SSSD operator:
 
 ```shell
-tox -e fmt           # Apply formatting standards to code.
-tox -e lint          # Check code against coding style standards.
-tox -e typecheck     # Run static type checks.
-tox -e unit          # Run unit tests.
+just fmt           # Apply formatting standards to code.
+just lint          # Check code against coding style standards.
+just typecheck     # Run static type checks.
+just unit          # Run unit tests.
 ```
 
 To run the SSSD operator integration tests, you'll need to have both
@@ -57,7 +58,7 @@ To run the SSSD operator integration tests, you'll need to have both
 on your machine:
 
 ```shell
-tox -e integration   # Run integration tests.
+just integration   # Run integration tests.
 ```
 
 If you're interested in contributing, take a look at our [contributing guidelines](./CONTRIBUTING.md).

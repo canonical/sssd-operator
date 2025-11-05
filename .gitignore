@@ -12,3 +12,5 @@ cover
 .terraform
 .terraform.lock.hcl
 *.tfstate*
+.venv/
+
