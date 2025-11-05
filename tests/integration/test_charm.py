@@ -59,4 +59,3 @@ def test_build_and_deploy(juju: jubilant.Juju, base: str, sssd: Path) -> None:
 
     juju.wait(check_sssd_waiting)
 
-
