@@ -6,7 +6,6 @@
 
 import logging
 import os
-import subprocess
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -39,27 +38,21 @@ def base(request: pytest.FixtureRequest) -> str:
 
 
 @pytest.fixture(scope="module")
-def sssd() -> Path:
+def sssd() -> Path | str:
     """Get `sssd` charm to use for integration tests.
 
-    If the `LOCAL_SSSD` environment variable is not set,
-    the `sssd` charm will be built locally.
+     If the `LOCAL_SSSD` environment variable is not set,
+    the `sssd` charm will be pulled from Charmhub instead.
 
     Returns:
-        `Path` object pointing to the locally built charm.
+        `Path` object if using a local `sssd` charm. `str` if pulling from Charmhub.
     """
-    if LOCAL_SSSD:
-        logger.info("using local `sssd` charm located at %s", LOCAL_SSSD)
-        return LOCAL_SSSD
+    if not LOCAL_SSSD:
+        logger.info("pulling `sssd` charm from charmhub")
+        return "sssd"
 
-    logger.info("building `sssd` charm locally")
-    # Build the charm using charmcraft
-    subprocess.run(["charmcraft", "pack"], check=True)
-    # Find the built charm file
-    charm_files = list(Path(".").glob("sssd_*.charm"))
-    if not charm_files:
-        raise RuntimeError("Failed to build sssd charm")
-    return charm_files[0]
+    logger.info("using local `sssd` charm located at %s", LOCAL_SSSD)
+    return LOCAL_SSSD
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -76,4 +69,3 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         default=False,
         help="keep temporarily created models",
     )
-
