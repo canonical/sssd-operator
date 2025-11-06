@@ -1,47 +1,46 @@
 #!/usr/bin/env python3
-# Copyright 2023 Canonical Ltd.
+# Copyright 2023-2025 Canonical Ltd.
 # See LICENSE file for licensing details.
 
 """Integration tests for sssd charm."""
 
-import asyncio
+from pathlib import Path
 
+import jubilant
 import pytest
-from pytest_operator.plugin import OpsTest
 
-SSSD = "sssd"
-BASE = ["ubuntu@24.04"]
-UBUNTU = "ubuntu"
+from constants import SSSD_APP_NAME, UBUNTU_APP_NAME
 
 
-@pytest.mark.abort_on_fail
-@pytest.mark.parametrize("base", BASE)
-@pytest.mark.skip_if_deployed
-async def test_build_and_deploy(ops_test: OpsTest, base: str, sssd_charm) -> None:
-    """Test building and deploying the sssd charm."""
-    await asyncio.gather(
-        ops_test.model.deploy(
-            str(await sssd_charm),
-            application_name=SSSD,
-            num_units=0,
-            base=base,
-        ),
-        ops_test.model.deploy(
-            UBUNTU,
-            channel="latest/stable",
-            application_name=UBUNTU,
-            num_units=1,
-            base=base,
-        ),
+def _check_sssd_waiting(status: jubilant.Status) -> bool:
+    """Check if sssd subordinate is in waiting state with correct message."""
+    try:
+        ubuntu_app = status.apps[UBUNTU_APP_NAME]
+        ubuntu_unit = ubuntu_app.units[f"{UBUNTU_APP_NAME}/0"]
+        sssd_unit = ubuntu_unit.subordinates[f"{SSSD_APP_NAME}/0"]
+    except KeyError:
+        return False
+
+    return (
+        sssd_unit.workload_status.current == "waiting"
+        and sssd_unit.workload_status.message == "Waiting for integrations: [`ldap`]"
     )
 
-    await ops_test.model.integrate(SSSD, UBUNTU)
 
-    # Assert that sssd is waiting to be connected to an ldap provider.
-    async with ops_test.fast_forward():
-        await ops_test.model.wait_for_idle(apps=[SSSD], status="waiting", timeout=1000)
-        assert ops_test.model.applications[SSSD].units[0].workload_status == "waiting"
-        assert (
-            ops_test.model.applications[SSSD].units[0].workload_status_message
-            == "Waiting for integrations: [`ldap`]"
-        )
+@pytest.mark.order(1)
+def test_deploy(juju: jubilant.Juju, base: str, sssd: Path | str) -> None:
+    """Test deploying the sssd charm."""
+    juju.deploy(
+        sssd,
+        SSSD_APP_NAME,
+        base=base,
+    )
+    juju.deploy(
+        "ubuntu",
+        UBUNTU_APP_NAME,
+        base=base,
+    )
+
+    juju.integrate(SSSD_APP_NAME, UBUNTU_APP_NAME)
+
+    juju.wait(_check_sssd_waiting)
