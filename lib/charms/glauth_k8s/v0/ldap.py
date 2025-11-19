@@ -125,7 +125,7 @@ LDAP related information in order to connect and authenticate to the LDAP server
 import json
 from functools import wraps
 from string import Template
-from typing import Any, Callable, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 
 import ops
 from ops.charm import (
@@ -135,17 +135,9 @@ from ops.charm import (
     RelationCreatedEvent,
     RelationEvent,
 )
-from ops.framework import EventSource, Object, ObjectEvents
+from ops.framework import EventSource, Handle, Object, ObjectEvents
 from ops.model import Relation, SecretNotFoundError
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    StrictBool,
-    ValidationError,
-    field_serializer,
-    field_validator,
-)
+from pydantic import StrictBool, ValidationError, version
 
 # The unique CharmHub library identifier, never change it
 LIBID = "5a535b3c4d0b40da98e29867128e57b9"
@@ -155,12 +147,76 @@ LIBAPI = 0
 
 # Increment this PATCH version before using `charmcraft publish-lib` or reset
 # to 0 if you are raising the major API version
-LIBPATCH = 7
+LIBPATCH = 11
 
-PYDEPS = ["pydantic>=2.5.3"]
+PYDEPS = ["pydantic"]
 
 DEFAULT_RELATION_NAME = "ldap"
 BIND_ACCOUNT_SECRET_LABEL_TEMPLATE = Template("relation-$relation_id-bind-account-secret")
+
+PYDANTIC_IS_V1 = int(version.VERSION.split(".")[0]) < 2
+if PYDANTIC_IS_V1:
+    # Pydantic v1 backwards compatibility logic,
+    # see https://docs.pydantic.dev/latest/migration/ for more info.
+    # This does not offer complete backwards compatibility
+
+    from pydantic import BaseModel as BaseModelV1
+    from pydantic import Field as FieldV1
+    from pydantic import validator
+    from pydantic.main import ModelMetaclass
+
+    def Field(*args: Any, **kwargs: Any) -> FieldV1:  # noqa N802
+        if frozen := kwargs.pop("frozen", None):
+            kwargs["allow_mutations"] = not frozen
+        return FieldV1(*args, **kwargs)
+
+    def field_validator(*args: Any, **kwargs: Any) -> Callable:
+        if kwargs.get("mode") == "before":
+            kwargs.pop("mode")
+            kwargs["pre"] = True
+        return validator(*args, **kwargs)
+
+    encoders_config = {}
+
+    def field_serializer(*fields: str, mode: Optional[str] = None) -> Callable:
+        def _field_serializer(f: Callable, *args: Any, **kwargs: Any) -> Callable:
+            @wraps(f)
+            def wrapper(self: object, *args: Any, **kwargs: Any) -> Any:
+                return f(self, *args, **kwargs)
+
+            encoders_config[wrapper] = fields
+            return wrapper
+
+        return _field_serializer
+
+    class ModelCompatibilityMeta(ModelMetaclass):
+        def __init__(self, name: str, bases: Tuple[object], attrs: Dict) -> None:
+            if not hasattr(self, "_encoders"):
+                self._encoders = {}
+
+            self._encoders.update({
+                encoder: func
+                for func in attrs.values()
+                if callable(func) and func in encoders_config
+                for encoder in encoders_config[func]
+            })
+
+            super().__init__(name, bases, attrs)
+
+    class BaseModel(BaseModelV1, metaclass=ModelCompatibilityMeta):
+        def model_dump(self, *args: Any, **kwargs: Any) -> Dict:
+            d = self.dict(*args, **kwargs)
+            for name, f in self._encoders.items():
+                d[name] = f(self, d[name])
+            return d
+
+else:
+    from pydantic import (  # type: ignore[no-redef]
+        BaseModel,
+        Field,
+        field_serializer,
+        field_validator,
+    )
 
 
 def leader_unit(func: Callable) -> Callable:
@@ -200,13 +256,11 @@ class Secret:
         cls,
         charm: CharmBase,
         label: str,
-        *,
-        content: Optional[dict[str, str]] = None,
-    ) -> "Secret":
+    ) -> Optional["Secret"]:
         try:
             secret = charm.model.get_secret(label=label)
         except SecretNotFoundError:
-            secret = charm.app.add_secret(label=label, content=content)
+            return None
 
         return Secret(secret)
 
@@ -229,6 +283,7 @@ class Secret:
 
 class LdapProviderBaseData(BaseModel):
     urls: List[str] = Field(frozen=True)
+    ldaps_urls: List[str] = Field(frozen=True)
     base_dn: str = Field(frozen=True)
     starttls: StrictBool = Field(frozen=True)
 
@@ -246,7 +301,21 @@ class LdapProviderBaseData(BaseModel):
 
         return vs
 
-    @field_serializer("urls")
+    @field_validator("ldaps_urls", mode="before")
+    @classmethod
+    def validate_ldaps_urls(cls, vs: List[str] | str) -> List[str]:
+        if isinstance(vs, str):
+            vs = json.loads(vs)
+            if isinstance(vs, str):
+                vs = [vs]
+
+        for v in vs:
+            if not v.startswith("ldaps://"):
+                raise ValidationError.from_exception_data("Invalid LDAPS URL scheme.")
+
+        return vs
+
+    @field_serializer("urls", "ldaps_urls")
     def serialize_list(self, urls: List[str]) -> str:
         return str(json.dumps(urls))
 
@@ -271,14 +340,15 @@ class LdapProviderData(LdapProviderBaseData):
 
 
 class LdapRequirerData(BaseModel):
-    model_config = ConfigDict(frozen=True)
-
-    user: str
-    group: str
+    user: str = Field(frozen=True)
+    group: str = Field(frozen=True)
 
 
 class LdapRequestedEvent(RelationEvent):
     """An event emitted when the LDAP integration is built."""
+
+    def __init__(self, handle: Handle, relation: Relation) -> None:
+        super().__init__(handle, relation, relation.app)
 
     @property
     def data(self) -> Optional[LdapRequirerData]:
@@ -339,7 +409,8 @@ class LdapProvider(Object):
             self.charm,
             label=BIND_ACCOUNT_SECRET_LABEL_TEMPLATE.substitute(relation_id=event.relation.id),
         )
-        secret.remove()
+        if secret:
+            secret.remove()
 
     def get_bind_password(self, relation_id: int) -> Optional[str]:
         """Retrieve the bind account password for a given integration."""
@@ -418,14 +489,26 @@ class LdapRequirer(Object):
         """Handle the event emitted when the LDAP related information is ready."""
         provider_app = event.relation.app
 
-        if not event.relation.data.get(provider_app):
+        if not (provider_data := event.relation.data.get(provider_app)):
             return
 
-        self.on.ldap_ready.emit(event.relation)
+        provider_data = dict(provider_data)
+        if self._load_provider_data(provider_data):
+            self.on.ldap_ready.emit(event.relation)
 
     def _on_ldap_relation_broken(self, event: RelationBrokenEvent) -> None:
         """Handle the event emitted when the LDAP integration is broken."""
         self.on.ldap_unavailable.emit(event.relation)
+
+    def _load_provider_data(self, provider_data: dict) -> Optional[LdapProviderData]:
+        if secret_id := provider_data.get("bind_password_secret"):
+            secret = self.charm.model.get_secret(id=secret_id)
+            provider_data["bind_password"] = secret.get_content().get("password")
+
+        try:
+            return LdapProviderData(**provider_data)
+        except ValidationError:
+            return None
 
     def consume_ldap_relation_data(
         self,
@@ -441,10 +524,10 @@ class LdapRequirer(Object):
             return None
 
         provider_data = dict(relation.data.get(relation.app))
-        if secret_id := provider_data.get("bind_password_secret"):
-            secret = self.charm.model.get_secret(id=secret_id)
-            provider_data["bind_password"] = secret.get_content().get("password")
-        return LdapProviderData(**provider_data) if provider_data else None
+        if not provider_data:
+            return None
+
+        return self._load_provider_data(provider_data)
 
     def _is_relation_active(self, relation: Relation) -> bool:
         """Whether the relation is active based on contained data."""
