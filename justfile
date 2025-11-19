@@ -60,13 +60,12 @@ generate-token:
 # Apply coding style standards to code
 [group("lint")]
 fmt: lock
-    {{uv_run}} black {{src_dir}} {{tests_dir}}
+    {{uv_run}} ruff format {{src_dir}} {{tests_dir}}
     {{uv_run}} ruff check --fix {{src_dir}} {{tests_dir}}
 
 # Check code against coding style standards
 [group("lint")]
 lint: lock
-    {{uv_run}} black --check --diff {{src_dir}} {{tests_dir}}
     {{uv_run}} codespell {{project_dir}}
     {{uv_run}} ruff check {{src_dir}} {{tests_dir}}
 
@@ -80,7 +79,7 @@ typecheck: lock
 unit *args: lock
     #!/usr/bin/env bash
     set -euxo pipefail
-    
+
     # Since tests are collected together by `pytest`, which means that all the import
     # statements will be executed together, the charm unit tests are run separately
     # from the utility module unit tests. The charm unit tests use a mocked `sssd` module
