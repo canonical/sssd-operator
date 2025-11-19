@@ -41,29 +41,23 @@ logger = logging.getLogger(__name__)
 class SSSDCharm(ops.CharmBase):
     """Charmed operator for SSSD, the System Security Services Daemon."""
 
-    def __init__(self, *args) -> None:
-        super().__init__(*args)
-        self.framework.observe(self.on.install, self._on_install)
-        self.framework.observe(self.on.stop, self._on_stop)
+    def __init__(self, framework: ops.Framework) -> None:
+        super().__init__(framework)
+        framework.observe(self.on.install, self._on_install)
+        framework.observe(self.on.stop, self._on_stop)
 
         self._ldap = LdapRequirer(self, LDAP_INTEGRATION_NAME)
-        self.framework.observe(
-            self._ldap.on.ldap_ready,
-            self._on_ldap_ready,
-        )
-        self.framework.observe(
-            self._ldap.on.ldap_unavailable,
-            self._on_ldap_unavailable,
-        )
+        framework.observe(self._ldap.on.ldap_ready, self._on_ldap_ready)
+        framework.observe(self._ldap.on.ldap_unavailable, self._on_ldap_unavailable)
 
         self._certificate_transfer = CertificateTransferRequires(
             self, CERTIFICATES_TRANSFER_INTEGRATION_NAME
         )
-        self.framework.observe(
+        framework.observe(
             self._certificate_transfer.on.certificate_available,
             self._on_certificate_available,
         )
-        self.framework.observe(
+        framework.observe(
             self._certificate_transfer.on.certificate_removed,
             self._on_certificate_removed,
         )
@@ -93,21 +87,23 @@ class SSSDCharm(ops.CharmBase):
     @refresh
     def _on_ldap_ready(self, event: LdapReadyEvent) -> None:
         """Handle ldap-ready event."""
-        name = event.relation.app.name
         # `data` cannot be `None` since `LdapReadyEvent` will not be emitted by the ldap charm
-        # library if the remote application data bag is empty. However, `pyright` complains here
-        # anyway so just signal to type checker that return value is `LdapProviderData`.
+        # library if the remote application data bag is empty or if required data is missing.
+        #
+        # However, `pyright` complains anyway so just signal to type checker that return value
+        # will always be `LdapProviderData`.
         data = cast(
             LdapProviderData, self._ldap.consume_ldap_relation_data(relation=event.relation)
         )
+        name = event.relation.app.name
         domains = sssd.domains()
 
         if data.starttls and not certificates_transfer_integration_exists(self):
             logger.warning(
                 (
                     "ldap domain `%s` has starttls enabled, but the %s integration is missing. "
-                    "cannot add domain to sssd configuration until the domain's tls certificates "
-                    "are provided. deferring until tls certificates are provided"
+                    + "cannot add domain to sssd configuration until the domain's tls "
+                    + "certificates are provided. deferring until tls certificates are provided"
                 ),
                 name,
                 CERTIFICATES_TRANSFER_INTEGRATION_NAME,
