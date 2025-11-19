@@ -20,7 +20,7 @@ import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
-import charms.operator_libs_linux.v0.apt as apt
+from charmlibs import apt
 from pyfakefs.fake_filesystem_unittest import TestCase
 from pyfakefs.helpers import set_gid, set_uid
 
@@ -81,7 +81,7 @@ class TestSSSD(TestCase):
             self.assertEqual(e.message, message)
 
     @patch("subprocess.run")
-    @patch("charms.operator_libs_linux.v0.apt.add_package")
+    @patch.object(apt, "add_package")
     def test_install(self, add_package, _) -> None:
         """Test `sssd.install()` function."""
         # Test when `sssd.install()` succeeds with no errors.
@@ -95,7 +95,7 @@ class TestSSSD(TestCase):
         with self.assertRaises(sssd.SSSDOpsError):
             sssd.install()
 
-    @patch("charms.operator_libs_linux.v0.apt.remove_package")
+    @patch.object(apt, "remove_package")
     def test_remove(self, remove_package) -> None:
         """Test `sssd.remove()` function."""
         # Test when `sssd.remove()` succeeds with no errors.

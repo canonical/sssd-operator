@@ -23,8 +23,8 @@ from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
+from charmlibs import apt
 from charms.glauth_k8s.v0.ldap import LdapProviderData
-from charms.operator_libs_linux.v0 import apt
 from charms.operator_libs_linux.v1 import systemd
 
 from constants import SSSD_CONFIG_FILE
