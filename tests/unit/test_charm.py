@@ -99,7 +99,8 @@ class TestCharm(unittest.TestCase):
         ldap_secret = testing.Secret(tracked_content={"password": ldap_secret_password})
         ldap_remote_app_name = "glauth"
         ldap_remote_app_data = {
-            "urls": json.dumps("ldap://10.0.0.128:3893"),
+            "urls": json.dumps(["ldap://10.0.0.128:3893"]),
+            "ldaps_urls": json.dumps([]),
             "base_dn": "dc=ubuntu,dc=com",
             "bind_dn": "cn=app,ou=model,dc=ubuntu,dc=com",
             "bind_password_secret": ldap_secret.id,
@@ -116,6 +117,19 @@ class TestCharm(unittest.TestCase):
             remote_app_name=ldap_remote_app_name,
             remote_app_data=ldap_remote_app_data,
         )
+
+        # Test `ldap_ready` hook when the bind password secret hasn't been created.
+        ldap_relation.remote_app_data.pop("bind_password_secret")
+
+        with self.ctx(
+            self.ctx.on.relation_changed(ldap_relation),
+            testing.State(relations={ldap_relation}),
+        ) as manager:
+            manager.run()
+
+        ldap_relation.remote_app_data["bind_password_secret"] = ldap_secret.id
+        self.ctx.unit_status_history.clear()
+        self.ctx.emitted_events.clear()
 
         # Test `ldap_ready` hook when starttls is enabled but `certificate_transfer`
         # integration does not exist.
