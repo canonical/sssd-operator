@@ -20,6 +20,7 @@ dependencies = [
     "ops ~= 2.0",
     "jsonschema",
     "pydantic>=2.5.3",
+    "charmlibs-apt",
 ]
 
 [project.optional-dependencies]
