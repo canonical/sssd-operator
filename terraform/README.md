@@ -17,13 +17,13 @@ section for more details.
 
 This module offers the following configurable units:
 
-| Name          | Type        | Description                                              | Default      | Required |
-|---------------|-------------|----------------------------------------------------------|--------------|:--------:|
-| `app_name`    | string      | Application name                                         | sssd         |          |
-| `base`        | string      | Base version to use for deployed machine                 | ubuntu@24.04 |          |
-| `channel`     | string      | Channel that charm is deployed from                      | latest/edge  |          |
-| `model_name`  | string      | Name of the model to deploy the charm to                 |              |    Y     |
-| `revision`    | number      | Revision number of charm to deploy                       | null         |          |
+| Name         | Type        | Description                              | Default      | Required |
+|--------------|-------------|------------------------------------------|--------------|:--------:|
+| `app_name`   | string      | Application name                         | sssd         |          |
+| `base`       | string      | Base version to use for deployed machine | ubuntu@24.04 |          |
+| `channel`    | string      | Channel that charm is deployed from      | latest/edge  |          |
+| `model_uuid` | string      | UUID of the model to deploy the charm to |              |    Y     |
+| `revision`   | number      | Revision number of charm to deploy       | null         |          |
 
 ### Outputs
 
@@ -43,5 +43,5 @@ To deploy this module with its required dependency, you can run
 the following command:
 
 ```shell
-terraform apply -var="model_name=<MODEL_NAME>" -auto-approve
+terraform apply -var="model_uuid=<MODEL_UUID>" -auto-approve
 ```
