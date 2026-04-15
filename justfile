@@ -80,20 +80,10 @@ unit *args: lock
     #!/usr/bin/env bash
     set -euxo pipefail
 
-    # Since tests are collected together by `pytest`, which means that all the import
-    # statements will be executed together, the charm unit tests are run separately
-    # from the utility module unit tests. The charm unit tests use a mocked `sssd` module
-    # that will bork `sssd` module tests if they are all collected together rather than
-    # run in isolated pytest processes.
-    {{uv_run}} coverage run --parallel-mode \
+    {{uv_run}} coverage run \
         --source={{src_dir}} \
         -m pytest -v --tb native -s \
-        {{args}} {{tests_dir / "unit" / "test_charm.py"}}
-    {{uv_run}} coverage run --parallel-mode \
-        --source={{src_dir}} \
-        -m pytest -v --tb native -s --ignore-glob *charm.py \
         {{args}} {{tests_dir / "unit"}}
-    {{uv_run}} coverage combine
     {{uv_run}} coverage report
 
 # Run integration tests
