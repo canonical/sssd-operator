@@ -1,4 +1,4 @@
-# Copyright 2023-2025 Canonical Ltd.
+# Copyright 2023-2026 Canonical Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ def version() -> str:
         raise SSSDOpsError(f"unable to retrieve sssd version. reason {e}")
 
 
-def active() -> bool:
+def is_active() -> bool:
     """Check if `sssd` service is active."""
     return systemd.service_running("sssd")
 
