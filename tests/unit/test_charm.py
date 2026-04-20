@@ -34,38 +34,6 @@ def mock_charm() -> testing.Context[SSSDCharm]:
     return testing.Context(SSSDCharm)
 
 
-@pytest.fixture(scope="function")
-def mock_sssd(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock all public functions of the `sssd` module with `monkeypatch`.
-
-    Returns:
-        A namespace object whose attributes are the individual Mock objects that
-        mirror the attribute names on the real `sssd` module.
-    """
-    mocks = {
-        "install": Mock(name="sssd.install"),
-        "remove": Mock(name="sssd.remove"),
-        "version": Mock(name="sssd.version"),
-        "active": Mock(name="sssd.active"),
-        "restart": Mock(name="sssd.restart"),
-        "enable": Mock(name="sssd.enable"),
-        "disable": Mock(name="sssd.disable"),
-        "read": Mock(name="sssd.read"),
-        "edit": Mock(name="sssd.edit"),
-        "domains": Mock(name="sssd.domains"),
-        "add_ldap_domain": Mock(name="sssd.add_ldap_domain"),
-        "update_ldap_domain": Mock(name="sssd.update_ldap_domain"),
-        "remove_ldap_domain": Mock(name="sssd.remove_ldap_domain"),
-        "add_tls_certs": Mock(name="sssd.add_tls_certs"),
-        "remove_tls_certs": Mock(name="sssd.remove_tls_certs"),
-    }
-    for name, mock in mocks.items():
-        monkeypatch.setattr(sssd, name, mock)
-
-    namespace = type("MockSSSD", (), mocks)()
-    return namespace
-
-
 def test_install(mock_charm: testing.Context, mock_sssd: Mock) -> None:
     """Test the `_on_install` hook."""
     # Test `install` hook reaches target state with no errors.
@@ -167,7 +135,7 @@ def test_ldap_ready(mock_charm: testing.Context, mock_sssd: Mock) -> None:
     mock_charm.unit_status_history.clear()
     mock_charm.emitted_events.clear()
     mock_sssd.domains.return_value = []
-    mock_sssd.active.return_value = True
+    mock_sssd.is_active.return_value = True
 
     with mock_charm(
         mock_charm.on.relation_changed(ldap_relation),
@@ -194,7 +162,7 @@ def test_ldap_ready(mock_charm: testing.Context, mock_sssd: Mock) -> None:
     mock_sssd.add_ldap_domain.reset_mock()
     mock_sssd.enable.reset_mock()
     mock_sssd.domains.return_value = [ldap_remote_app_name]
-    mock_sssd.active.return_value = True
+    mock_sssd.is_active.return_value = True
 
     with mock_charm(
         mock_charm.on.relation_changed(ldap_relation),
@@ -235,7 +203,7 @@ def test_ldap_unavailable(mock_charm: testing.Context, mock_sssd: Mock) -> None:
 
     # Test `ldap_unavailable` hook when there's still domains in `sssd.conf`.
     mock_sssd.domains.return_value = ["polaris"]
-    mock_sssd.active.return_value = True
+    mock_sssd.is_active.return_value = True
 
     with mock_charm(
         mock_charm.on.relation_broken(ldap_relation),
@@ -253,7 +221,7 @@ def test_ldap_unavailable(mock_charm: testing.Context, mock_sssd: Mock) -> None:
     mock_sssd.remove_ldap_domain.reset_mock()
     mock_sssd.restart.reset_mock()
     mock_sssd.domains.return_value = []
-    mock_sssd.active.return_value = False
+    mock_sssd.is_active.return_value = False
 
     with mock_charm(
         mock_charm.on.relation_broken(ldap_relation),
@@ -286,7 +254,7 @@ def test_certificate_available(mock_charm: testing.Context, mock_sssd: Mock) -> 
     )
 
     # Test `certificate_available` hook reaches target state with no errors.
-    mock_sssd.active.return_value = True
+    mock_sssd.is_active.return_value = True
     with mock_charm(
         mock_charm.on.relation_changed(receive_ca_cert_relation),
         testing.State(relations={ldap_relation, receive_ca_cert_relation}),
@@ -328,7 +296,7 @@ def test_certificate_removed(mock_charm: testing.Context, mock_sssd: Mock) -> No
     )
 
     # Test `certificate_unavailable` hook reaches target state with no errors.
-    mock_sssd.active.return_value = True
+    mock_sssd.is_active.return_value = True
     with mock_charm(
         mock_charm.on.relation_broken(receive_ca_cert_relation),
         testing.State(relations={ldap_relation, receive_ca_cert_relation}),
@@ -355,16 +323,3 @@ def test_certificate_removed(mock_charm: testing.Context, mock_sssd: Mock) -> No
         assert mock_charm.unit_status_history[1:] == [
             ops.MaintenanceStatus("Removing stale TLS certificates")
         ]
-
-
-def test_refresh(mock_charm: testing.Context, mock_sssd: Mock) -> None:
-    """Test `refresh` decorator."""
-    ldap_relation = testing.Relation(endpoint=LDAP_INTEGRATION_NAME, interface="ldap", id=23)
-
-    # Test that `refresh` will say sssd is not running if service is not active.
-    mock_sssd.active.return_value = False
-    mock_sssd.version.return_value = "2.9.4-1.1ubuntu6.2"
-
-    with mock_charm(mock_charm.on.install(), testing.State(relations={ldap_relation})) as manager:
-        state = manager.run()
-        assert state.unit_status == ops.BlockedStatus("SSSD not running")
