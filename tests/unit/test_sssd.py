@@ -135,9 +135,9 @@ def test_version(mock_run) -> None:
         sssd.version()
 
 
-def test_active(mock_run) -> None:
-    """Test `sssd.active()` function."""
-    sssd.active()
+def test_is_active(mock_run) -> None:
+    """Test `sssd.is_active()` function."""
+    sssd.is_active()
     assert mock_run.call_args[0][0] == ["systemctl", "--quiet", "is-active", "sssd"]
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2023-2025 Canonical Ltd.
+# Copyright 2023-2026 Canonical Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import logging
 from typing import cast
 
 import ops
+from charmed_hpc_libs.ops import StopCharm, refresh
 from charms.certificate_transfer_interface.v0.certificate_transfer import (
     CertificateAvailableEvent,
     CertificateRemovedEvent,
@@ -33,9 +34,12 @@ from charms.glauth_k8s.v0.ldap import (
 
 import sssd
 from constants import CERTIFICATES_TRANSFER_INTEGRATION_NAME, LDAP_INTEGRATION_NAME
-from utils import StopCharm, certificates_transfer_integration_exists, refresh
+from state import certificates_transfer_exists, check_sssd
 
 logger = logging.getLogger(__name__)
+
+# Refresh the status of the SSSD application/unit after an event handler completes.
+refresh = refresh(hook=check_sssd)
 
 
 class SSSDCharm(ops.CharmBase):
@@ -98,7 +102,7 @@ class SSSDCharm(ops.CharmBase):
         name = event.relation.app.name
         domains = sssd.domains()
 
-        if data.starttls and not certificates_transfer_integration_exists(self):
+        if data.starttls and not certificates_transfer_exists(self).ok:
             logger.warning(
                 (
                     "ldap domain `%s` has starttls enabled, but the %s integration is missing. "
