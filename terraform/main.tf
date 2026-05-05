@@ -13,8 +13,8 @@
 # limitations under the License.
 
 resource "juju_application" "sssd" {
-  name       = var.app_name
-  model_uuid = var.model_uuid
+  name        = var.app_name
+  model_uuid  = var.model_uuid
 
   charm {
     name     = "sssd"
@@ -22,4 +22,6 @@ resource "juju_application" "sssd" {
     channel  = var.channel
     revision = var.revision
   }
+
+  config = var.config
 }

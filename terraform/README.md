@@ -8,39 +8,51 @@ for the Juju Terraform provider.
 
 ## Requirements
 
-This module requires a Juju model to be available. Refer to the [usage](#usage)
-section for more details.
+- Terraform >= 1.0
+- Juju Terraform provider >= 1.0.0, < 2.0.0
+- An existing Juju model
 
 ## API
 
 ### Inputs
 
-This module offers the following configurable units:
-
-| Name         | Type        | Description                              | Default      | Required |
-|--------------|-------------|------------------------------------------|--------------|:--------:|
-| `app_name`   | string      | Application name                         | sssd         |          |
-| `base`       | string      | Base version to use for deployed machine | ubuntu@24.04 |          |
-| `channel`    | string      | Channel that charm is deployed from      | latest/edge  |          |
-| `model_uuid` | string      | UUID of the model to deploy the charm to |              |    Y     |
-| `revision`   | number      | Revision number of charm to deploy       | null         |          |
+| Name          | Type        | Description                                                        | Default         | Required |
+|---------------|-------------|--------------------------------------------------------------------|-----------------|:--------:|
+| `app_name`    | string      | The Juju application name                                          | `"sssd"`        |          |
+| `base`        | string      | Operating system base (for example, `ubuntu@24.04`)                | `null`          |          |
+| `channel`     | string      | Charm channel to deploy from                                       | `"latest/beta"` |          |
+| `config`      | map(string) | Map of charm configuration options                                 | `{}`            |          |
+| `model_uuid`  | string      | UUID of the Juju model to deploy the charm into                    |                 |    Y     |
+| `revision`    | number      | Charm revision to deploy. Null deploys the latest on given channel | `null`          |          |
 
 ### Outputs
 
-After applying, the module exports the following outputs:
+| Name          | Description                              |
+|---------------|------------------------------------------|
+| `application` | The deployed `juju_application` resource |
+| `requires`    | Map of `requires` endpoint names         |
 
-| Name       | Description                 |
-|------------|-----------------------------|
-| `app_name` | Application name            |
-| `requires` | Map of `requires` endpoints |
+The `requires` output exposes the following endpoint names:
+
+| Key               | Endpoint name     |
+|-------------------|-------------------|
+| `juju-info`       | `juju-info`       |
+| `ldap`            | `ldap`            |
+| `receive-ca-cert` | `receive-ca-cert` |
 
 ## Usage
 
-Users should ensure that Terraform is aware of the Juju model dependency of the
-charm module.
+Ensure that Terraform is aware of the Juju model dependency of the charm module.
 
-To deploy this module with its required dependency, you can run
-the following command:
+```hcl
+module "sssd" {
+  source     = "git::https://github.com/canonical/sssd-operator//terraform"
+  model_uuid = juju_model.my_model.uuid
+}
+```
+
+To deploy this module with its required dependency, you can run the following
+command:
 
 ```shell
 terraform apply -var="model_uuid=<MODEL_UUID>" -auto-approve

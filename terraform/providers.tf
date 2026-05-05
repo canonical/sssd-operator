@@ -12,16 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "application" {
-  description = "The deployed sssd juju_application resource"
-  value       = juju_application.sssd
-}
-
-output "requires" {
-  description = "Map of requires endpoint names"
-  value = {
-    juju-info       = "juju-info"
-    ldap            = "ldap"
-    receive-ca-cert = "receive-ca-cert"
-  }
-}
+provider "juju" {}

@@ -19,24 +19,31 @@ variable "app_name" {
 }
 
 variable "base" {
-  description = "Charm base"
+  description = "Operating system base to use for the deployed application (for example, ubuntu@24.04)"
   type        = string
-  default     = "ubuntu@24.04"
+  default     = null
 }
 
 variable "channel" {
-  description = "Charm channel"
+  description = "Charm channel to deploy from"
   type        = string
-  default     = "latest/edge"
+  default     = "latest/beta"
+}
+
+variable "config" {
+  description = "Map of charm configuration options"
+  type        = map(string)
+  default     = {}
 }
 
 variable "model_uuid" {
-  description = "Model UUID"
+  description = "UUID of the Juju model to deploy the charm into"
   type        = string
+  nullable    = false
 }
 
 variable "revision" {
-  description = "Charm revision"
+  description = "Charm revision to deploy. Null deploys the latest on the given channel"
   type        = number
   nullable    = true
   default     = null
