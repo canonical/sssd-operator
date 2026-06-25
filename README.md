@@ -33,6 +33,7 @@ further resources for you to explore:
 
 * [Charmed HPC documentation](https://documentation.ubuntu.com/charmed-hpc)
 * [Open an issue](https://github.com/canonical/sssd-operator/issues/new?title=ISSUE+TITLE&body=*Please+describe+your+issue*)
+* [Ask a question](https://discourse.ubuntu.com/c/project/hpc/151)
 
 ## 🛠️ Development
 
@@ -73,7 +74,7 @@ Here's some links to help you get started with joining the community:
 * [Ubuntu Code of Conduct](https://ubuntu.com/community/ethos/code-of-conduct)
 * [Contributing guidelines](./CONTRIBUTING.md)
 * [Join the conversation on Matrix](https://matrix.to/#/#hpc:ubuntu.com)
-* [Get the latest news on Discourse](https://discourse.ubuntu.com/c/hpc/151)
+* [Get the latest news or ask and answer questions on the Ubuntu Discourse](https://discourse.ubuntu.com/c/project/hpc/151)
 
 ## 📋 License
 
