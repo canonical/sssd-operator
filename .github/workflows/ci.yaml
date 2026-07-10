@@ -75,6 +75,10 @@ jobs:
         run: sudo snap install astral-uv --classic
       - name: Install `charmcraft`
         run: sudo snap install charmcraft --classic
+      - name: Install `gherkinator`
+        run: |
+          sudo apt-add-repository ppa:nuccitheboss/gherkinator --yes
+          sudo apt install gherkinator
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
         with:
