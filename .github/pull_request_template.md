@@ -21,7 +21,7 @@
 
 * [ ] I have created a pull request to add or update relevant documentation in [canonical/charmed-hpc-docs](https://github.com/canonical/charmed-hpc-docs) or another documentation location.
 
-[//]: # (If documentation has been updated or added in a location other than charmed-hpc/docs, please note the location here.)
+[//]: # (If documentation has been updated or added in a location other than canonical/charmed-hpc-docs], please note the location here.)
 
 Or:
 

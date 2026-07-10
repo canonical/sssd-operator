@@ -5,8 +5,8 @@
 ![GitHub License](https://img.shields.io/github/license/canonical/sssd-operator)
 [![Matrix](https://img.shields.io/matrix/ubuntu-hpc%3Amatrix.org?logo=matrix&label=ubuntu-hpc)](https://matrix.to/#/#hpc:ubuntu.com)
 
-A [Juju](https://juju.is) charm for automating the full lifecycle operations of 
-[SSSD](https://sssd.io) (System Security Services Daemon), a system service to access 
+A [Juju](https://juju.is) charm for automating the full lifecycle operations of
+[SSSD](https://sssd.io) (System Security Services Daemon), a system service to access
 remote directories and authentication mechanisms such as LDAP, Kerberos, or FreeIPA.
 
 ## ✨ Getting Started
@@ -33,7 +33,7 @@ further resources for you to explore:
 
 * [Charmed HPC documentation](https://documentation.ubuntu.com/charmed-hpc)
 * [Open an issue](https://github.com/canonical/sssd-operator/issues/new?title=ISSUE+TITLE&body=*Please+describe+your+issue*)
-* [Ask a question on GitHub](https://github.com/orgs/charmed-hpc/discussions/categories/q-a)
+* [Ask a question](https://discourse.ubuntu.com/c/project/hpc/151)
 
 ## 🛠️ Development
 
@@ -66,7 +66,7 @@ If you're interested in contributing, take a look at our [contributing guideline
 ## 🤝 Project and community
 
 The SSSD operator is a project of the [Ubuntu High-Performance Computing community](https://ubuntu.com/community/governance/teams/hpc).
-Interested in contributing bug fixes, patches, documentation, or feedback? Want to join the 
+Interested in contributing bug fixes, patches, documentation, or feedback? Want to join the
 Ubuntu HPC community? You've come to the right place 🤩
 
 Here's some links to help you get started with joining the community:
@@ -74,14 +74,13 @@ Here's some links to help you get started with joining the community:
 * [Ubuntu Code of Conduct](https://ubuntu.com/community/ethos/code-of-conduct)
 * [Contributing guidelines](./CONTRIBUTING.md)
 * [Join the conversation on Matrix](https://matrix.to/#/#hpc:ubuntu.com)
-* [Get the latest news on Discourse](https://discourse.ubuntu.com/c/hpc/151)
-* [Ask and answer questions on GitHub](https://github.com/orgs/charmed-hpc/discussions/categories/q-a)
+* [Get the latest news or ask and answer questions on the Ubuntu Discourse](https://discourse.ubuntu.com/c/project/hpc/151)
 
 ## 📋 License
 
 The SSSD operator is free software, distributed under the Apache Software License, version 2.0.
 See the [Apache-2.0 LICENSE](./LICENSE) file for further details.
 
-SSSD is licensed under the GNU General Public License, version 3.0. 
+SSSD is licensed under the GNU General Public License, version 3.0.
 See the upstream SSSD [COPYING](https://github.com/SSSD/sssd/blob/master/COPYING) file
 for further licensing information about SSSD.
