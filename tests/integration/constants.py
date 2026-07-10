@@ -1,7 +1,26 @@
-# Copyright 2025 Canonical Ltd.
-# See LICENSE file for licensing details.
+# Copyright 2026 Canonical Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-"""Constants used within the sssd charm integration tests."""
+"""Constants used within the SSSD charm's integration tests."""
 
-SSSD_APP_NAME = "sssd"
-UBUNTU_APP_NAME = "ubuntu"
+from pathlib import Path
+
+FEATURE_DIR = Path(__file__).parent.resolve() / "features"
+EDGE_FEATURES = [str(feature) for feature in FEATURE_DIR.glob("*edge*")]
+
+LDAP_INTEGRATOR_APP_NAME = "ldap-integrator"
+LDAP_APP_NAME = "openldap"
+
+BIND_PASSWORD = "secret"
+BIND_PASSWORD_SECRET = "password"
