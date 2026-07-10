@@ -1,0 +1,109 @@
+#cloud-config
+package_reboot_if_required: false
+packages:
+- slapd
+- ldap-utils
+- debconf-utils
+write_files:
+- path: /root/server.conf
+  permissions: '0644'
+  content: |
+    slapd slapd/no_configuration boolean false
+    slapd slapd/domain string test.ubuntu.com
+    slapd shared/organization string ubuntu
+    slapd slapd/password1 password secret
+    slapd slapd/password2 password secret
+    slapd slapd/purge_database boolean true
+    slapd slapd/move_old_database boolean false
+- path: /root/init.ldif
+  permissions: '0644'
+  content: |
+    dn: ou=People,dc=test,dc=ubuntu,dc=com
+    objectClass: organizationalUnit
+    ou: People
+
+    dn: ou=Groups,dc=test,dc=ubuntu,dc=com
+    objectClass: organizationalUnit
+    ou: Groups
+
+    dn: uid=nucci,ou=People,dc=test,dc=ubuntu,dc=com
+    uid: nucci
+    objectClass: inetOrgPerson
+    objectClass: posixAccount
+    cn: nucci
+    sn: nucci
+    givenName: nucci
+    mail: nucci@example.com
+    userPassword: test
+    uidNumber: 10000
+    gidNumber: 10000
+    loginShell: /bin/bash
+    homeDirectory: /home/nucci
+
+    dn: cn=nucci,ou=Groups,dc=test,dc=ubuntu,dc=com
+    cn: nucci
+    objectClass: posixGroup
+    gidNumber: 10000
+    memberUid: nucci
+
+    dn: cn=research,ou=Groups,dc=test,dc=ubuntu,dc=com
+    cn: research
+    objectClass: posixGroup
+    gidNumber: 10100
+    memberUid: nucci
+- path: /root/enable-tls.ldif
+  permissions: '0644'
+  content: |
+    dn: cn=config
+    changetype: modify
+    replace: olcTLSCertificateFile
+    olcTLSCertificateFile: /etc/ldap/sasl2/server.crt
+    -
+    replace: olcTLSCertificateKeyFile
+    olcTLSCertificateKeyFile: /etc/ldap/sasl2/server.key
+    -
+    replace: olcTLSCACertificateFile
+    olcTLSCACertificateFile: /etc/ldap/sasl2/ca.crt
+- path: /root/slapd-tls.conf
+  permissions: '0644'
+  content: |
+    SLAPD_CONF=
+    SLAPD_USER="openldap"
+    SLAPD_GROUP="openldap"
+    SLAPD_PIDFILE=
+    SLAPD_SERVICES="ldap:/// ldapi:/// ldaps:///"
+    SLAPD_SENTINEL_FILE=/etc/ldap/noslapd
+    SLAPD_OPTIONS=""
+- path: /root/v3.ext.tmpl
+  permissions: '0644'
+  content: |
+    [ req ]
+    default_bits = 2048
+    distinguished_name = req_distinguished_name
+    req_extensions = v3_req
+    prompt = no
+
+    [ req_distinguished_name ]
+    CN = $LDAP_HOST
+
+    [ v3_req ]
+    keyUsage = critical, digitalSignature, keyEncipherment
+    extendedKeyUsage = serverAuth
+    subjectAltName = @alt_names
+
+    [ alt_names ]
+    DNS.1 = $LDAP_HOST
+    IP.1 = $LDAP_IP
+postruncmd:
+- debconf-set-selections < /root/server.conf
+- dpkg-reconfigure -f noninteractive slapd
+- ldapadd -x -D 'cn=admin,dc=test,dc=ubuntu,dc=com' -w secret -f /root/init.ldif -H 'ldap:///'
+- openssl genrsa -out /etc/ssl/private/ca.key 4096
+- openssl req -x509 -new -nodes -key /etc/ssl/private/ca.key -sha256 -days 3650 -subj '/CN=Test CA' -out /etc/ldap/sasl2/ca.crt
+- openssl genrsa -out /etc/ldap/sasl2/server.key 2048
+- openssl req -new -key /etc/ldap/sasl2/server.key -subj "/CN=$(hostname)" -out /root/server.csr
+- LDAP_HOST=$(hostname) LDAP_IP=$(hostname -I) envsubst < /root/v3.ext.tmpl > /root/v3.ext
+- openssl x509 -req -in /root/server.csr -CA /etc/ldap/sasl2/ca.crt -CAkey /etc/ssl/private/ca.key -CAcreateserial -out /etc/ldap/sasl2/server.crt -days 825 -sha256 -extensions v3_req -extfile /root/v3.ext
+- chmod 644 /etc/ldap/sasl2/ca.crt /etc/ldap/sasl2/server.crt
+- chmod 600 /etc/ssl/private/ca.key /etc/ldap/sasl2/server.key
+- chown -R openldap:openldap /etc/ldap/sasl2

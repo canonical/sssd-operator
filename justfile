@@ -1,5 +1,5 @@
 #!/usr/bin/env just --justfile
-# Copyright 2023-2025 Canonical Ltd.
+# Copyright 2023-2026 Canonical Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,9 +92,8 @@ integration *args: lock
     #!/usr/bin/env bash
     set -euxo pipefail
 
-    charmcraft -v pack
-    mv sssd_*.charm sssd.charm
-    export LOCAL_SSSD={{project_dir / "sssd.charm"}}
+    gherkinator validate {{tests_dir}}/integration/plans
+    gherkinator generate {{tests_dir}}/integration/plans --output-dir {{tests_dir}}/integration/features
     {{uv_run}} pytest \
         -v \
         --tb native \
