@@ -1,5 +1,5 @@
 #!/usr/bin/env just --justfile
-# Copyright 2023-2026 Canonical Ltd.
+# Copyright 2026 Canonical Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ src_dir := project_dir / "src"
 tests_dir := project_dir / "tests"
 
 export PY_COLORS := "1"
-export PYTHONBREAKPOINT := "ipdb.set_trace"
 export PYTHONPATH := project_dir + ":" + project_dir / "lib" + ":" + src_dir
 
 uv_run := "uv run --frozen --extra dev"
@@ -29,24 +28,95 @@ uv_run := "uv run --frozen --extra dev"
 default:
     @just help
 
+# Show available recipes
+help:
+    @just --list --unsorted
+
+# Prepare the local environment
+setup: env
+
+# Apply static checks
+check: fmt lint typecheck
+
+# Run tests for specified targets, or all tests if none specified
+test *targets:
+    #!/usr/bin/env bash
+    if [ "{{ targets }}" = "" ]; then
+        just test-all
+        exit 0
+    fi
+
+    for target in {{ targets }}; do
+        if just --show $target > /dev/null 2>&1; then
+            echo "Running $target tests..."
+            just $target
+        else
+            echo "$target tests not found, skipping."
+            exit 1
+        fi
+    done
+
+# Run all test suites
+test-all: unit integration
+
+# Run unit tests
+unit *args: lock
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    {{ uv_run }} coverage run \
+        --source={{ src_dir }} \
+        -m pytest -v --tb native -s \
+        {{ args }} {{ tests_dir / "unit" }}
+    {{ uv_run }} coverage report
+
+# Run integration tests
+integration *args: lock
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    gherkinator validate {{ tests_dir }}/integration/plans
+    gherkinator generate {{ tests_dir }}/integration/plans --output-dir {{tests_dir}}/integration/features
+    {{uv_run}} pytest \
+        -v \
+        --tb native \
+        -s \
+        --log-cli-level=INFO \
+        {{ args }} \
+        {{ tests_dir / "integration" }}
+
+# Build specified artifacts, or all artifacts if none specified
+build *args:
+    charmcraft -v pack {{ args }}
+
 # Regenerate uv.lock
-[group("dev")]
 lock:
     uv lock
 
-# Create a development environment
-[group("dev")]
+# Create a uv development environment
 env: lock
     uv sync --extra dev
 
 # Upgrade uv.lock with the latest dependencies
-[group("dev")]
 upgrade:
     uv lock --upgrade
 
-# Generate publishing token for Charmhub
-[group("dev")]
-generate-token:
+# Apply formatting standards
+fmt: lock
+    {{ uv_run }} ruff format {{ src_dir }} {{ tests_dir }}
+    {{ uv_run }} ruff check --fix {{ src_dir }} {{ tests_dir }}
+
+# Check files against style standards
+lint: lock
+    {{ uv_run }} codespell {{ project_dir }}
+    {{ uv_run }} ruff check {{ src_dir }} {{ tests_dir }}
+
+# Perform type checking
+typecheck: lock
+    {{ uv_run }} pyright
+
+# Generate Charmhub token
+generate-charmhub-token:
     charmcraft login \
         --export=.charmhub.secret \
         --permission=package-manage-metadata \
@@ -55,53 +125,10 @@ generate-token:
         --permission=package-view-metadata \
         --permission=package-view-releases \
         --permission=package-view-revisions \
-        --ttl=31536000  # 365 days
+        --ttl=31536000
 
-# Apply coding style standards to code
-[group("lint")]
-fmt: lock
-    {{uv_run}} ruff format {{src_dir}} {{tests_dir}}
-    {{uv_run}} ruff check --fix {{src_dir}} {{tests_dir}}
-
-# Check code against coding style standards
-[group("lint")]
-lint: lock
-    {{uv_run}} codespell {{project_dir}}
-    {{uv_run}} ruff check {{src_dir}} {{tests_dir}}
-
-# Run static type checker on code
-[group("lint")]
-typecheck: lock
-    {{uv_run}} pyright
-
-# Run unit tests
-[group("test")]
-unit *args: lock
-    #!/usr/bin/env bash
-    set -euxo pipefail
-
-    {{uv_run}} coverage run \
-        --source={{src_dir}} \
-        -m pytest -v --tb native -s \
-        {{args}} {{tests_dir / "unit"}}
-    {{uv_run}} coverage report
-
-# Run integration tests
-[group("test")]
-integration *args: lock
-    #!/usr/bin/env bash
-    set -euxo pipefail
-
-    gherkinator validate {{tests_dir}}/integration/plans
-    gherkinator generate {{tests_dir}}/integration/plans --output-dir {{tests_dir}}/integration/features
-    {{uv_run}} pytest \
-        -v \
-        --tb native \
-        -s \
-        --log-cli-level=INFO \
-        {{args}} \
-        {{tests_dir / "integration"}}
-
-# Show available recipes
-help:
-    @just --list --unsorted
+# Clean project directory
+clean:
+    {{ uv_run }} coverage erase || true
+    rm -rf .mypy_cache .ruff_cache .pytest_cache *.egg-info build/ .charmhub.secret *.charm
+    find . -name __pycache__ -type d -exec rm -rf {} + || true
