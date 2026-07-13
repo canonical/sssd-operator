@@ -21,7 +21,7 @@ which provide some useful commands that will help you while hacking on `sssd-ope
 
 ```shell
 # Create a development environment
-just env
+just setup
 
 # Upgrade uv.lock with the latest dependencies
 just upgrade
