@@ -19,7 +19,7 @@ for the Juju Terraform provider.
 | Name          | Type        | Description                                                        | Default         | Required |
 |---------------|-------------|--------------------------------------------------------------------|-----------------|:--------:|
 | `app_name`    | string      | The Juju application name                                          | `"sssd"`        |          |
-| `base`        | string      | Operating system base (for example, `ubuntu@24.04`)                | `null`          |          |
+| `base`        | string      | Operating system base (for example, `ubuntu@26.04`)                | `null`          |          |
 | `channel`     | string      | Charm channel to deploy from                                       | `"latest/beta"` |          |
 | `config`      | map(string) | Map of charm configuration options                                 | `{}`            |          |
 | `model_uuid`  | string      | UUID of the Juju model to deploy the charm into                    |                 |    Y     |

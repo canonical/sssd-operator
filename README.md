@@ -14,7 +14,7 @@ remote directories and authentication mechanisms such as LDAP, Kerberos, or Free
 To deploy the SSSD operator, you'll need to integrate it with a principal charm:
 
 ```shell
-juju deploy ubuntu --base ubuntu@24.04
+juju deploy ubuntu --base ubuntu@26.04
 juju deploy sssd --channel edge
 juju integrate sssd ubuntu
 ```
