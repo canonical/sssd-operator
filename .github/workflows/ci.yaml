@@ -27,9 +27,9 @@ jobs:
 
   unit-test:
     name: Unit tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: canonical/hpc-team/.github/actions/setup-just@main
       - name: Install uv
         run: sudo snap install astral-uv --classic
@@ -42,7 +42,7 @@ jobs:
       - ci
       - unit-test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: canonical/hpc-team/.github/actions/setup-just@main
       - name: Install uv
         run: sudo snap install astral-uv --classic
@@ -56,5 +56,6 @@ jobs:
         uses: charmed-kubernetes/actions-operator@main
         with:
           provider: lxd
-          juju-channel: 3.6/stable
+          lxd-channel: 5.21/stable
+          juju-channel: 3.6/edge
       - run: just integration
