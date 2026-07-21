@@ -30,9 +30,8 @@ links:
 
 subordinate: true
 type: charm
-base: ubuntu@24.04
 platforms:
-  amd64:
+  ubuntu@26.04:amd64:
 
 parts:
   sssd:

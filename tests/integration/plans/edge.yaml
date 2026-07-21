@@ -27,7 +27,7 @@ scenarios:
     And I add model 'sssd'
     And I switch to model 'sssd'
     And I deploy 'sssd' from a local charm located at 'sssd.charm'
-    And I deploy 'ubuntu' on base 'ubuntu@24.04' from channel 'latest/stable'
+    And I deploy 'ubuntu' on base 'ubuntu@26.04' from channel 'latest/stable'
     And I integrate 'sssd:juju-info' with 'ubuntu:juju-info'
     Then all agents are 'idle' in model 'sssd'
     And the workload status for app 'sssd' is 'waiting'
@@ -39,7 +39,7 @@ scenarios:
     Given 'sssd' is deployed
     And I add model 'ldap'
     And I set 'cloudinit-userdata' for model 'ldap' to 'tests/integration/assets/openldap-cloud-init.yaml'
-    And I deploy 'ubuntu' in model 'ldap' on base 'ubuntu@24.04' from channel 'latest/stable' with name 'openldap'
+    And I deploy 'ubuntu' in model 'ldap' on base 'ubuntu@26.04' from channel 'latest/stable' with name 'openldap'
     And I deploy 'ldap-integrator' in model 'sssd' on base 'ubuntu@24.04' from channel 'latest/stable'
     And I configure 'ldap-integrator' with data from 'openldap'
     And I integrate 'sssd:ldap' with 'ldap-integrator:ldap'
