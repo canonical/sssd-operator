@@ -25,6 +25,7 @@ description: |
   a more robust database to store local users as well as extended user data.
 links:
   contact: https://matrix.to/#/#hpc:ubuntu.com
+  documentation: https://ubuntu.com/hpc/docs/latest/howto/deploy/deploy-identity-provider/
   source: https://github.com/canonical/sssd-operator
   issues: https://github.com/canonical/sssd-operator/issues
 
