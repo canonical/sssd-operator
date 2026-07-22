@@ -21,7 +21,7 @@ dependencies = [
     "jsonschema",
     "pydantic>=2.13.4",
     "charmlibs-apt",
-    "charmed-hpc-libs[ops] ~= 0.4",
+    "charmed-hpc-libs[ops] ~= 0.5",
 ]
 
 [project.optional-dependencies]
