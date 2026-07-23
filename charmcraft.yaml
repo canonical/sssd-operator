@@ -15,17 +15,27 @@
 name: sssd
 title: SSSD
 summary: >
-  Charmed SSSD is an open source operator designed to deploy and operate SSSD.
+  Charmed operator for SSSD
 description: |
-  SSSD provides a set of daemons to manage access to remote directories and
-  authentication mechanisms. It provides an NSS and PAM interface toward
-  the system and a pluggable backend system to connect to multiple different
-  account sources as well as D-Bus interface. It is also the basis to provide
-  client auditing and policy services for projects like FreeIPA. It provides
-  a more robust database to store local users as well as extended user data.
+  This charm deploys and manages SSSD, a set of daemons that enable access to
+  remote directories and authentication mechanisms. It provides an NSS and PAM
+  interface toward the system and a pluggable backend system to connect to
+  multiple different account sources as well as D-Bus interface. It is also
+  the basis to provide client auditing and policy services for projects like
+  FreeIPA. It provides a more robust database to store local users as well as
+  extended user data.
+
+  This charm is a core component of the Charmed HPC identity stack. See the
+  following how-to in Charmed HPC's documentation for more information:
+
+  - [How to deploy an identity provider](https://ubuntu.com/hpc/docs/latest/howto/deploy/deploy-identity-provider/)
+
+  For more information about Charmed HPC, view the
+    [full documentation](https://ubuntu.com/hpc/docs/latest).
 links:
   contact: https://matrix.to/#/#hpc:ubuntu.com
-  documentation: https://ubuntu.com/hpc/docs/latest/howto/deploy/deploy-identity-provider/
+  documentation: https://ubuntu.com/hpc/docs/latest
+  website: https://ubuntu.com/hpc
   source: https://github.com/canonical/sssd-operator
   issues: https://github.com/canonical/sssd-operator/issues
 
