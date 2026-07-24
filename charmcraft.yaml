@@ -18,7 +18,7 @@ summary: >
   Charmed operator for SSSD
 description: |
   This charm deploys and manages SSSD, a set of daemons that enable access to
-  remote directories and authentication mechanisms. It provides an NSS and PAM
+  remote directories and authentication mechanisms. SSSD provides an NSS and PAM
   interface toward the system and a pluggable backend system to connect to
   multiple different account sources as well as D-Bus interface. It is also
   the basis to provide client auditing and policy services for projects like
