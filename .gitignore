@@ -12,7 +12,3 @@ cover
 .terraform
 .terraform.lock.hcl
 *.tfstate*
-.venv/
-
-# `gherkinator` generated files.
-tests/**/features

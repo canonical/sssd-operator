@@ -15,6 +15,9 @@
 
 uv := require("uv")
 
+# Manage charm test plans with gherkinator
+mod gherkinator "tests/integration/"
+
 project_dir := justfile_directory()
 src_dir := project_dir / "src"
 tests_dir := project_dir / "tests"
@@ -36,7 +39,7 @@ help:
 setup: env
 
 # Apply static checks
-check: fmt lint typecheck
+check: lint typecheck
 
 # Run tests for specified targets, or all tests if none specified
 test *targets:
@@ -75,9 +78,7 @@ integration *args: lock
     #!/usr/bin/env bash
     set -euxo pipefail
 
-    gherkinator validate {{ tests_dir }}/integration/plans
-    gherkinator generate {{ tests_dir }}/integration/plans --output-dir {{tests_dir}}/integration/features
-    {{uv_run}} pytest \
+    {{ uv_run }} pytest \
         -v \
         --tb native \
         -s \
