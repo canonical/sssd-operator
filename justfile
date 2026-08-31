@@ -23,7 +23,7 @@ src_dir := project_dir / "src"
 tests_dir := project_dir / "tests"
 
 export PY_COLORS := "1"
-export PYTHONPATH := project_dir + ":" + project_dir / "lib" + ":" + src_dir
+export PYTHONPATH := project_dir + ":" + src_dir
 
 uv_run := "uv run --frozen --extra dev"
 

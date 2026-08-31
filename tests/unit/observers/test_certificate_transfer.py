@@ -29,25 +29,26 @@ from constants import CERTIFICATES_TRANSFER_INTEGRATION_NAME, LDAP_INTEGRATION_N
 class TestCertificateTransferObserver:
     """Test the ``certificate_transfer`` integration event observer."""
 
-    def test_certificate_available(
+    def test_certificates_available(
         self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock
     ) -> None:
-        """Test the ``_on_certificate_available`` event handler."""
+        """Test the ``_on_certificates_available`` event handler."""
         ldap_relation = testing.Relation(endpoint=LDAP_INTEGRATION_NAME, interface="ldap", id=23)
 
-        cert_remote_unit_data = {
-            "certificate": (cert := "super-secret-cert"),
-            "ca": (ca := "super-secret-ca-cert"),
-            "chain": json.dumps([cert, ca]),
-        }
+        # v1 ``certificate_transfer`` stores certificates in the provider's *application*
+        # databag as a JSON-encoded list under the ``certificates`` key, with ``version: 1``
+        # in the requirer's local app databag. See ``charmlibs/interfaces/certificate_transfer``.
         receive_ca_cert_relation = testing.Relation(
             endpoint=CERTIFICATES_TRANSFER_INTEGRATION_NAME,
             interface="certificate_transfer",
             id=24,
-            remote_units_data={0: cert_remote_unit_data},
+            local_app_data={"version": "1"},
+            remote_app_data={
+                "certificates": json.dumps(["super-secret-cert", "super-secret-ca-cert"])
+            },
         )
 
-        # Test `certificate_available` hook reaches target state with no errors.
+        # Test ``certificates_available`` hook reaches target state with no errors.
         mock_sssd.service.is_active.return_value = True
         with mock_charm(
             mock_charm.on.relation_changed(receive_ca_cert_relation),
@@ -55,14 +56,16 @@ class TestCertificateTransferObserver:
         ) as manager:
             state = manager.run()
             assert state.unit_status == ops.ActiveStatus()
-            mock_sssd.add_tls_certs.assert_called_once_with(
-                24, ["super-secret-cert", "super-secret-ca-cert"]
-            )
+            # ``event.certificates`` is a ``set[str]``; assert via set comparison for determinism.
+            mock_sssd.add_tls_certs.assert_called_once()
+            call_args = mock_sssd.add_tls_certs.call_args
+            assert call_args[0][0] == 24
+            assert set(call_args[0][1]) == {"super-secret-cert", "super-secret-ca-cert"}
             assert mock_charm.unit_status_history[1:] == [
                 ops.MaintenanceStatus("Adding new TLS certificates")
             ]
 
-        # Test when `certificate_available` hook fails to add new certificates.
+        # Test when ``certificates_available`` hook fails to add new certificates.
         mock_charm.unit_status_history.clear()
         mock_sssd.add_tls_certs.side_effect = sssd.SSSDOpsError("failed to add tls certs!!")
 
@@ -78,19 +81,20 @@ class TestCertificateTransferObserver:
                 ops.MaintenanceStatus("Adding new TLS certificates")
             ]
 
-    def test_certificate_removed(
+    def test_certificates_removed(
         self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock
     ) -> None:
-        """Test the ``_on_certificate_removed`` event handler."""
+        """Test the ``_on_certificates_removed`` event handler."""
         ldap_relation = testing.Relation(endpoint=LDAP_INTEGRATION_NAME, interface="ldap", id=23)
 
         receive_ca_cert_relation = testing.Relation(
             endpoint=CERTIFICATES_TRANSFER_INTEGRATION_NAME,
             interface="certificate_transfer",
             id=24,
+            local_app_data={"version": "1"},
         )
 
-        # Test `certificate_unavailable` hook reaches target state with no errors.
+        # Test ``certificates_removed`` hook reaches target state with no errors.
         mock_sssd.service.is_active.return_value = True
         with mock_charm(
             mock_charm.on.relation_broken(receive_ca_cert_relation),
@@ -103,7 +107,7 @@ class TestCertificateTransferObserver:
                 ops.MaintenanceStatus("Removing stale TLS certificates")
             ]
 
-        # Test when `certificate_unavailable` hook fails to remove stale certificates.
+        # Test when ``certificates_removed`` hook fails to remove stale certificates.
         mock_charm.unit_status_history.clear()
         mock_sssd.remove_tls_certs.side_effect = sssd.SSSDOpsError("failed to remove tls certs!!")
 
