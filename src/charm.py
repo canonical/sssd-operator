@@ -15,31 +15,11 @@
 
 """Charmed operator for SSSD, the System Security Services Daemon."""
 
-import logging
-from typing import cast
-
 import ops
-from charmed_hpc_libs.ops import StopCharm, refresh
-from charms.certificate_transfer_interface.v0.certificate_transfer import (
-    CertificateAvailableEvent,
-    CertificateRemovedEvent,
-    CertificateTransferRequires,
-)
-from charms.glauth_k8s.v0.ldap import (
-    LdapProviderData,
-    LdapReadyEvent,
-    LdapRequirer,
-    LdapUnavailableEvent,
-)
 
-import sssd
-from constants import CERTIFICATES_TRANSFER_INTEGRATION_NAME, LDAP_INTEGRATION_NAME
-from state import certificates_transfer_exists, check_sssd
-
-logger = logging.getLogger(__name__)
-
-# Refresh the status of the SSSD application/unit after an event handler completes.
-refresh = refresh(hook=check_sssd)
+from integrations import CertificateTransferObserver, LdapObserver
+from operations import LifecycleObserver
+from sssd import SSSDManager
 
 
 class SSSDCharm(ops.CharmBase):
@@ -47,139 +27,12 @@ class SSSDCharm(ops.CharmBase):
 
     def __init__(self, framework: ops.Framework) -> None:
         super().__init__(framework)
-        framework.observe(self.on.install, self._on_install)
-        framework.observe(self.on.stop, self._on_stop)
 
-        self._ldap = LdapRequirer(self, LDAP_INTEGRATION_NAME)
-        framework.observe(self._ldap.on.ldap_ready, self._on_ldap_ready)
-        framework.observe(self._ldap.on.ldap_unavailable, self._on_ldap_unavailable)
+        self.sssd = SSSDManager()
+        self.lifecycle = LifecycleObserver(self)
 
-        self._certificate_transfer = CertificateTransferRequires(
-            self, CERTIFICATES_TRANSFER_INTEGRATION_NAME
-        )
-        framework.observe(
-            self._certificate_transfer.on.certificate_available,
-            self._on_certificate_available,
-        )
-        framework.observe(
-            self._certificate_transfer.on.certificate_removed,
-            self._on_certificate_removed,
-        )
-
-    @refresh
-    def _on_install(self, event: ops.InstallEvent) -> None:
-        """Handle when sssd charm is installed on unit."""
-        self.unit.status = ops.MaintenanceStatus("Installing SSSD")
-        try:
-            sssd.install()
-            self.unit.set_workload_version(sssd.version())
-        except sssd.SSSDOpsError as e:
-            logger.error(e.message)
-            event.defer()
-            raise StopCharm(
-                ops.BlockedStatus("Failed to install SSSD. See `juju debug-log` for details")
-            )
-
-    def _on_stop(self, _: ops.StopEvent) -> None:
-        """Handle when sssd unit is going to be torn down by Juju."""
-        self.unit.status = ops.MaintenanceStatus("Disabling SSSD")
-        sssd.disable()
-        self.unit.status = ops.MaintenanceStatus("Removing SSSD")
-        sssd.remove()
-        self.unit.status = ops.MaintenanceStatus("SSSD removed")
-
-    @refresh
-    def _on_ldap_ready(self, event: LdapReadyEvent) -> None:
-        """Handle ldap-ready event."""
-        # `data` cannot be `None` since `LdapReadyEvent` will not be emitted by the ldap charm
-        # library if the remote application data bag is empty or if required data is missing.
-        #
-        # However, `pyright` complains anyway so just signal to type checker that return value
-        # will always be `LdapProviderData`.
-        data = cast(
-            LdapProviderData, self._ldap.consume_ldap_relation_data(relation=event.relation)
-        )
-        name = event.relation.app.name
-        domains = sssd.domains()
-
-        if data.starttls and not certificates_transfer_exists(self).ok:
-            logger.warning(
-                (
-                    "ldap domain `%s` has starttls enabled, but the %s integration is missing. "
-                    + "cannot add domain to sssd configuration until the domain's tls "
-                    + "certificates are provided. deferring until tls certificates are provided"
-                ),
-                name,
-                CERTIFICATES_TRANSFER_INTEGRATION_NAME,
-            )
-            event.defer()
-            raise StopCharm(
-                ops.WaitingStatus(
-                    f"Waiting for integrations: [`{CERTIFICATES_TRANSFER_INTEGRATION_NAME}`]"
-                )
-            )
-
-        if name not in domains:
-            self.unit.status = ops.MaintenanceStatus(
-                f"Adding domain `{name}` to SSSD configuration"
-            )
-            sssd.add_ldap_domain(name, data)
-        else:
-            self.unit.status = ops.MaintenanceStatus(
-                f"Updating domain `{name}` in SSSD configuration"
-            )
-            sssd.update_ldap_domain(name, data)
-
-        if len(domains) == 0:
-            logger.info("first domain added to sssd configuration. enabling sssd service")
-            self.unit.status = ops.MaintenanceStatus("Enabling SSSD")
-            sssd.enable()
-        else:
-            logger.info("sssd configuration has been updated. restarting sssd service")
-            self.unit.status = ops.MaintenanceStatus("Restarting SSSD")
-            sssd.restart()
-
-    @refresh
-    def _on_ldap_unavailable(self, event: LdapUnavailableEvent) -> None:
-        """Handle server-unavailable event."""
-        domain = event.relation.app.name
-        sssd.remove_ldap_domain(domain)
-        if domains := sssd.domains():
-            logger.info("restarting sssd service with configured domains %s", domains)
-            self.unit.status = ops.MaintenanceStatus("Restarting SSSD")
-            sssd.restart()
-        else:
-            logger.info("no domains exist in sssd configuration. disabling sssd service")
-            self.unit.status = ops.MaintenanceStatus("Disabling SSSD")
-            sssd.disable()
-
-    @refresh
-    def _on_certificate_available(self, event: CertificateAvailableEvent):
-        """Handle `CertificateAvailableEvent`."""
-        self.unit.status = ops.MaintenanceStatus("Adding new TLS certificates")
-        try:
-            sssd.add_tls_certs(event.relation_id, event.chain)
-        except sssd.SSSDOpsError as e:
-            logger.error(e.message)
-            raise StopCharm(
-                ops.BlockedStatus(
-                    "Failed to add new TLS certificates. See `juju debug-log` for details"
-                )
-            )
-
-    @refresh
-    def _on_certificate_removed(self, event: CertificateRemovedEvent) -> None:
-        """Handle certificate-unavailable event."""
-        self.unit.status = ops.MaintenanceStatus("Removing stale TLS certificates")
-        try:
-            sssd.remove_tls_certs(event.relation_id)
-        except sssd.SSSDOpsError as e:
-            logger.error(e.message)
-            raise StopCharm(
-                ops.BlockedStatus(
-                    "Failed to remove stale TLS certificates. See `juju debug-log` for details"
-                )
-            )
+        self.ldap = LdapObserver(self)
+        self.certificates = CertificateTransferObserver(self)
 
 
 if __name__ == "__main__":  # pragma: nocover

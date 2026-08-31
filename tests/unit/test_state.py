@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for the `state` module."""
+"""Unit tests for the ``state`` module."""
 
 from unittest.mock import Mock
 
@@ -50,17 +50,17 @@ from constants import LDAP_INTEGRATION_NAME
 )
 def test_check_sssd(
     monkeypatch: pytest.MonkeyPatch,
-    mock_sssd: Mock,
     ldap_ok: bool,
     is_active: bool,
     expected_status: ops.StatusBase,
 ) -> None:
-    """Test `check_sssd` returns the correct unit status for each combination of conditions."""
-    monkeypatch.setattr(state, "ldap_exists", lambda _charm: ConditionEvaluation(ok=ldap_ok))
-    mock_sssd.is_active.return_value = is_active
+    """Test ``check_sssd`` returns the correct unit status for each combination of conditions."""
+    monkeypatch.setattr(state, "ldap_exists", lambda _observer: ConditionEvaluation(ok=ldap_ok))
+    observer = Mock()
+    observer.charm.sssd.service.is_active.return_value = is_active
 
-    status = state.check_sssd(Mock())
+    status = state.check_sssd(observer)
 
     assert status == expected_status
     if not ldap_ok:
-        mock_sssd.is_active.assert_not_called()
+        observer.charm.sssd.service.is_active.assert_not_called()

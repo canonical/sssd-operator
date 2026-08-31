@@ -17,28 +17,28 @@
 from typing import TYPE_CHECKING
 
 import ops
-from charmed_hpc_libs.ops import integration_exists
+from charmed_hpc_libs.ops import Observer, integration_exists
 
-import sssd
-from constants import CERTIFICATES_TRANSFER_INTEGRATION_NAME, LDAP_INTEGRATION_NAME
+from constants import LDAP_INTEGRATION_NAME
 
 if TYPE_CHECKING:
-    from charm import SSSDCharm
+    pass
 
-
-# Check if the `certificates_transfer` integration exists.
-certificates_transfer_exists = integration_exists(CERTIFICATES_TRANSFER_INTEGRATION_NAME)
 
 # Check if the `ldap` integration exists.
 ldap_exists = integration_exists(LDAP_INTEGRATION_NAME)
 
 
-def check_sssd(charm: "SSSDCharm") -> ops.StatusBase:
-    """Determine the state of the SSSD application/unit based on satisfied conditions."""
-    if not ldap_exists(charm).ok:
+def check_sssd(observer: Observer) -> ops.StatusBase:
+    """Determine the state of the SSSD application/unit.
+
+    Args:
+        observer: An SSSD charm observer instance.
+    """
+    if not ldap_exists(observer).ok:
         return ops.WaitingStatus(f"Waiting for integrations: [`{LDAP_INTEGRATION_NAME}`]")
 
-    if not sssd.is_active():
+    if not observer.charm.sssd.service.is_active():
         return ops.WaitingStatus("Waiting for `sssd` to start")
 
     return ops.ActiveStatus()
