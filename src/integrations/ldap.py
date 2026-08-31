@@ -33,11 +33,7 @@ if TYPE_CHECKING:
     from charm import SSSDCharm
 
 _logger = logging.getLogger(__name__)
-
-# Refresh the status of the SSSD application/unit after an event handler completes.
 refresh = refresh(hook=check_sssd)
-
-# Check if the `receive-ca-cert` integration exists.
 certificates_transfer_exists = integration_exists(CERTIFICATES_TRANSFER_INTEGRATION_NAME)
 
 
