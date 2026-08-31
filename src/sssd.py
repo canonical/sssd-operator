@@ -26,7 +26,7 @@ from pathlib import Path
 
 from charmed_hpc_libs.errors import Error
 from charmed_hpc_libs.ops import AptLifecycleManager, SystemctlServiceManager
-from charms.glauth_k8s.v0.ldap import LdapProviderData
+from charmlibs.interfaces.ldap import LdapProviderData
 
 _logger = logging.getLogger(__name__)
 _SSSD_CONFIG_FILE = "/etc/sssd/sssd.conf"

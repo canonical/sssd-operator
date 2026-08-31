@@ -19,9 +19,9 @@ from typing import TYPE_CHECKING
 
 import ops
 from charmed_hpc_libs.ops import Observer, StopCharm, refresh
-from charms.certificate_transfer_interface.v0.certificate_transfer import (
-    CertificateAvailableEvent,
-    CertificateRemovedEvent,
+from charmlibs.interfaces.certificate_transfer import (
+    CertificatesAvailableEvent,
+    CertificatesRemovedEvent,
     CertificateTransferRequires,
 )
 
@@ -45,20 +45,20 @@ class CertificateTransferObserver(Observer):
             self.charm, CERTIFICATES_TRANSFER_INTEGRATION_NAME
         )
         self.charm.framework.observe(
-            self.certificate_transfer.on.certificate_available,
-            self._on_certificate_available,
+            self.certificate_transfer.on.certificate_set_updated,
+            self._on_certificates_available,
         )
         self.charm.framework.observe(
-            self.certificate_transfer.on.certificate_removed,
-            self._on_certificate_removed,
+            self.certificate_transfer.on.certificates_removed,
+            self._on_certificates_removed,
         )
 
     @refresh
-    def _on_certificate_available(self, event: CertificateAvailableEvent) -> None:
-        """Handle when new TLS certificates are available from a provider."""
+    def _on_certificates_available(self, event: CertificatesAvailableEvent) -> None:
+        """Handle when the set of TLS certificates provided to the unit is updated."""
         self.charm.unit.status = ops.MaintenanceStatus("Adding new TLS certificates")
         try:
-            self.charm.sssd.add_tls_certs(event.relation_id, event.chain)
+            self.charm.sssd.add_tls_certs(event.relation_id, event.certificates)
         except SSSDOpsError as e:
             _logger.exception(e.message)
             raise StopCharm(
@@ -68,8 +68,8 @@ class CertificateTransferObserver(Observer):
             )
 
     @refresh
-    def _on_certificate_removed(self, event: CertificateRemovedEvent) -> None:
-        """Handle when TLS certificates are removed by a provider."""
+    def _on_certificates_removed(self, event: CertificatesRemovedEvent) -> None:
+        """Handle when the set of TLS certificates provided to the unit is removed."""
         self.charm.unit.status = ops.MaintenanceStatus("Removing stale TLS certificates")
         try:
             self.charm.sssd.remove_tls_certs(event.relation_id)

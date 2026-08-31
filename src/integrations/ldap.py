@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, cast
 
 import ops
 from charmed_hpc_libs.ops import Observer, StopCharm, integration_exists, refresh
-from charms.glauth_k8s.v0.ldap import (
+from charmlibs.interfaces.ldap import (
     LdapProviderData,
     LdapReadyEvent,
     LdapRequirer,
@@ -93,6 +93,8 @@ class LdapObserver(Observer):
             _logger.info("first domain added to sssd configuration. enabling sssd service")
             self.charm.unit.status = ops.MaintenanceStatus("Enabling SSSD")
             self.charm.sssd.service.enable()
+            self.charm.unit.status = ops.MaintenanceStatus("Starting SSSD")
+            self.charm.sssd.service.restart()
         else:
             _logger.info("sssd configuration has been updated. restarting sssd service")
             self.charm.unit.status = ops.MaintenanceStatus("Restarting SSSD")

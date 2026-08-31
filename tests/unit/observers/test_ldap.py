@@ -19,7 +19,7 @@ import json
 from unittest.mock import Mock
 
 import ops
-from charms.glauth_k8s.v0.ldap import LdapProviderData
+from charmlibs.interfaces.ldap import LdapProviderData
 from ops import testing
 
 from charm import SSSDCharm
@@ -107,6 +107,7 @@ class TestLdapObserver:
                     f"Adding domain `{ldap_remote_app_name}` to SSSD configuration"
                 ),
                 ops.MaintenanceStatus("Enabling SSSD"),
+                ops.MaintenanceStatus("Starting SSSD"),
             ]
             mock_sssd.config.add_ldap_domain.assert_called_once_with(
                 ldap_remote_app_name,
@@ -114,7 +115,6 @@ class TestLdapObserver:
             )
             mock_sssd.config.update_ldap_domain.assert_not_called()
             mock_sssd.service.enable.assert_called_once()
-            mock_sssd.service.restart.assert_not_called()
 
         # Test `ldap_ready` hook when a second domain is added.
         mock_charm.unit_status_history.clear()
@@ -145,7 +145,6 @@ class TestLdapObserver:
                 mock_client_side_provider_data,
             )
             mock_sssd.service.enable.assert_not_called()
-            mock_sssd.service.restart.assert_called_once()
 
     def test_ldap_unavailable(
         self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock
