@@ -1,4 +1,4 @@
-# Copyright 2025-2026 Canonical Ltd.
+# Copyright 2026 Canonical Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Constants used within the SSSD charmed operator."""
+"""Integration observers for the SSSD charm."""
 
-CERTIFICATES_TRANSFER_INTEGRATION_NAME = "receive-ca-cert"
-LDAP_INTEGRATION_NAME = "ldap"
+__all__ = ["CertificateTransferObserver", "LdapObserver"]
+
+from .certificate_transfer import CertificateTransferObserver
+from .ldap import LdapObserver

@@ -17,37 +17,50 @@
 from unittest.mock import Mock
 
 import pytest
+from charmed_hpc_libs.ops.machine import AptOpsManager
+from ops import testing
 
 import sssd
+from charm import SSSDCharm
 
 
 @pytest.fixture(scope="function")
-def mock_sssd(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Mock all public functions of the `sssd` module with `monkeypatch`.
+def mock_charm() -> testing.Context[SSSDCharm]:
+    """Mock ``SSSDCharm``."""
+    return testing.Context(SSSDCharm)
 
-    Returns:
-        A namespace object whose attributes are the individual Mock objects that
-        mirror the attribute names on the real `sssd` module.
-    """
-    mocks = {
-        "install": Mock(name="sssd.install"),
-        "remove": Mock(name="sssd.remove"),
-        "version": Mock(name="sssd.version"),
-        "is_active": Mock(name="sssd.is_active"),
-        "restart": Mock(name="sssd.restart"),
-        "enable": Mock(name="sssd.enable"),
-        "disable": Mock(name="sssd.disable"),
-        "read": Mock(name="sssd.read"),
-        "edit": Mock(name="sssd.edit"),
-        "domains": Mock(name="sssd.domains"),
-        "add_ldap_domain": Mock(name="sssd.add_ldap_domain"),
-        "update_ldap_domain": Mock(name="sssd.update_ldap_domain"),
-        "remove_ldap_domain": Mock(name="sssd.remove_ldap_domain"),
-        "add_tls_certs": Mock(name="sssd.add_tls_certs"),
-        "remove_tls_certs": Mock(name="sssd.remove_tls_certs"),
-    }
-    for name, mock in mocks.items():
-        monkeypatch.setattr(sssd, name, mock)
 
-    namespace = type("MockSSSD", (), mocks)()
-    return namespace
+@pytest.fixture(scope="function")
+def mock_sssd(monkeypatch: pytest.MonkeyPatch) -> "Mock":
+    """Mock the ``SSSDManager`` class used by the charm's observers."""
+    install_mock = Mock(name="install")
+    remove_mock = Mock(name="remove")
+    version_mock = Mock(name="version", return_value="2.9.4-1.1ubuntu6.2")
+    add_tls_certs_mock = Mock(name="add_tls_certs")
+    remove_tls_certs_mock = Mock(name="remove_tls_certs")
+
+    monkeypatch.setattr(AptOpsManager, "install", install_mock)
+    monkeypatch.setattr(AptOpsManager, "remove", remove_mock)
+    monkeypatch.setattr(AptOpsManager, "version", version_mock)
+
+    service_mock = Mock(name="service")
+    config_mock = Mock(name="config")
+    monkeypatch.setattr(sssd.SSSDManager, "service", service_mock)
+    monkeypatch.setattr(sssd.SSSDManager, "config", config_mock)
+
+    monkeypatch.setattr(sssd.SSSDManager, "add_tls_certs", add_tls_certs_mock)
+    monkeypatch.setattr(sssd.SSSDManager, "remove_tls_certs", remove_tls_certs_mock)
+
+    return type(
+        "MockSSSD",
+        (),
+        {
+            "install": install_mock,
+            "remove": remove_mock,
+            "version": version_mock,
+            "service": service_mock,
+            "config": config_mock,
+            "add_tls_certs": add_tls_certs_mock,
+            "remove_tls_certs": remove_tls_certs_mock,
+        },
+    )()
