@@ -14,18 +14,11 @@
 
 """Manage the state of the SSSD charmed operator."""
 
-from typing import TYPE_CHECKING
-
 import ops
 from charmed_hpc_libs.ops import Observer, integration_exists
 
 from constants import LDAP_INTEGRATION_NAME
 
-if TYPE_CHECKING:
-    pass
-
-
-# Check if the `ldap` integration exists.
 ldap_exists = integration_exists(LDAP_INTEGRATION_NAME)
 
 
