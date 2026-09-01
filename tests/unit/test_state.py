@@ -37,7 +37,7 @@ from constants import LDAP_INTEGRATION_NAME
         pytest.param(
             True,
             False,
-            ops.WaitingStatus("Waiting for `sssd` to start"),
+            ops.WaitingStatus("Waiting for SSSD to start"),
             id="waiting_when_sssd_is_not_running",
         ),
         pytest.param(
