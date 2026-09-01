@@ -87,7 +87,7 @@ class TestLdapObserver:
             assert state.deferred[0].name == "ldap_ready"
             assert len(mock_charm.emitted_events) == 2
 
-        # Test `ldap_ready` hook when the first domain is added.
+        # Test `ldap_ready` hook when the domain is added.
         mock_charm.unit_status_history.clear()
         mock_charm.emitted_events.clear()
         mock_sssd.config.domains.return_value = []
@@ -103,48 +103,13 @@ class TestLdapObserver:
             assert state.unit_status == ops.ActiveStatus()
             assert len(state.deferred) == 0
             assert mock_charm.unit_status_history[1:] == [
-                ops.MaintenanceStatus(
-                    f"Adding domain `{ldap_remote_app_name}` to SSSD configuration"
-                ),
-                ops.MaintenanceStatus("Enabling SSSD"),
-                ops.MaintenanceStatus("Starting SSSD"),
+                ops.MaintenanceStatus("Updating SSSD configuration")
             ]
-            mock_sssd.config.add_ldap_domain.assert_called_once_with(
-                ldap_remote_app_name,
-                mock_client_side_provider_data,
-            )
-            mock_sssd.config.update_ldap_domain.assert_not_called()
-            mock_sssd.service.enable.assert_called_once()
-
-        # Test `ldap_ready` hook when a second domain is added.
-        mock_charm.unit_status_history.clear()
-        mock_charm.emitted_events.clear()
-        mock_sssd.config.add_ldap_domain.reset_mock()
-        mock_sssd.service.enable.reset_mock()
-        mock_sssd.config.domains.return_value = [ldap_remote_app_name]
-        mock_sssd.service.is_active.return_value = True
-
-        with mock_charm(
-            mock_charm.on.relation_changed(ldap_relation),
-            testing.State(
-                relations={ldap_relation, receive_ca_cert_relation}, secrets={ldap_secret}
-            ),
-        ) as manager:
-            state = manager.run()
-            assert state.unit_status == ops.ActiveStatus()
-            assert len(state.deferred) == 0
-            assert mock_charm.unit_status_history[1:] == [
-                ops.MaintenanceStatus(
-                    f"Updating domain `{ldap_remote_app_name}` in SSSD configuration"
-                ),
-                ops.MaintenanceStatus("Restarting SSSD"),
-            ]
-            mock_sssd.config.add_ldap_domain.assert_not_called()
             mock_sssd.config.update_ldap_domain.assert_called_once_with(
                 ldap_remote_app_name,
                 mock_client_side_provider_data,
             )
-            mock_sssd.service.enable.assert_not_called()
+            mock_sssd.service.restart.assert_called_once()
 
     def test_ldap_unavailable(
         self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock

@@ -136,35 +136,6 @@ class TestSSSDConfigmanager:
         fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_FULL_SSSD_CONFIG)
         assert SSSDConfigManager().domains() == ["ldap"]
 
-    def test_add_ldap_domain(self, mocker: MockerFixture, fs: FakeFilesystem) -> None:
-        """Test the ``add_ldap_domain()`` method."""
-        fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_FULL_SSSD_CONFIG)
-
-        ldap_data = mocker.MagicMock()
-        ldap_data.urls = ["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"]
-        ldap_data.base_dn = "dc=glauth,dc=com"
-        ldap_data.bind_dn = "cn=sssd,ou=sssd,dc=glauth,dc=com"
-        ldap_data.bind_password = "supersecret"
-        ldap_data.starttls = True
-
-        SSSDConfigManager().add_ldap_domain("polaris", ldap_data)
-        config = SSSDConfigManager().read()
-        assert dict(config["domain/polaris"]) == {
-            "id_provider": "ldap",
-            "auth_provider": "ldap",
-            "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
-            "ldap_search_base": "dc=glauth,dc=com",
-            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=glauth,dc=com",
-            "ldap_default_authtok_type": "password",
-            "ldap_default_authtok": "supersecret",
-            "ldap_use_tokengroups": "False",
-            "ldap_group_member": "member",
-            "ldap_schema": "rfc2307bis",
-            "ldap_id_use_start_tls": "True",
-            "cache_credentials": "True",
-        }
-        assert SSSDConfigManager().domains() == ["ldap", "polaris"]
-
     def test_update_ldap_domain(self, mocker: MockerFixture, fs: FakeFilesystem) -> None:
         """Test the ``update_ldap_domain()`` method."""
         fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_FULL_SSSD_CONFIG)
@@ -241,7 +212,7 @@ class TestSSSDConfigmanager:
         ldap_data.bind_password = "supersecret"
         ldap_data.starttls = True
 
-        SSSDConfigManager().add_ldap_domain("polaris", ldap_data)
+        SSSDConfigManager().update_ldap_domain("polaris", ldap_data)
         SSSDConfigManager().remove_ldap_domain("ldap")
         assert len(SSSDConfigManager().domains()) == 1
 

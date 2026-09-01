@@ -78,17 +78,24 @@ class SSSDConfigManager:
         domains_ = config["sssd"].get("domains", "")
         return domains_.split(",") if domains_ else []
 
-    def add_ldap_domain(self, name: str, data: LdapProviderData) -> None:
-        """Add a new LDAP domain to the ``sssd`` service configuration.
+    def update_ldap_domain(self, name: str, data: LdapProviderData) -> None:
+        """Update an LDAP domain in the ``sssd`` service configuration.
 
         Args:
-            name: Name of LDAP domain.
-            data: Domain configuration data received from LDAP provider.
-        """
-        _logger.info(
-            "adding ldap domain `%s` to sssd configuration file %s", name, _SSSD_CONFIG_FILE
-        )
+            name: Name of LDAP domain to update.
+            data: Updated domain configuration data received from LDAP provider.
 
+        Notes:
+            This method will add a new LDAP domain to the ``sssd`` service configuration
+            if it does not exist within the current service configuration.
+        """
+        domains = self.domains()
+        if not domains:  # There are no existing domains.
+            domains = [name]
+        elif name not in domains:  # There are existing domains, but this domain is new.
+            domains.append(name)
+
+        domain_name = f"domain/{name}"
         domain_config = {
             "id_provider": "ldap",
             "auth_provider": "ldap",
@@ -103,42 +110,26 @@ class SSSDConfigManager:
             "ldap_id_use_start_tls": "True" if data.starttls else "False",
             "cache_credentials": "True",
         }
+
         with self.edit() as config:
+            config["sssd"]["domains"] = ",".join(domains)
+
             try:
-                config["sssd"]["domains"] += f",{name}"
+                existing = dict(config[domain_name])
+                _logger.info(
+                    "updating ldap domain `%s` in sssd configuration file %s",
+                    name,
+                    _SSSD_CONFIG_FILE,
+                )
             except KeyError:
-                config["sssd"]["domains"] = name
+                existing = {}
+                _logger.info(
+                    "adding ldap domain `%s` to sssd configuration file %s",
+                    name,
+                    _SSSD_CONFIG_FILE,
+                )
 
-            config[f"domain/{name}"] = domain_config
-
-    def update_ldap_domain(self, name: str, data: LdapProviderData) -> None:
-        """Update an LDAP domain in the ``sssd`` service configuration.
-
-        Args:
-            name: Name of LDAP domain to update.
-            data: Updated domain configuration data received from LDAP provider.
-
-        Notes:
-            This method will add a new LDAP domain to the ``sssd`` service configuration
-            if it does not exist within the current service configuration.
-        """
-        if name not in self.domains():
-            self.add_ldap_domain(name, data)
-            return
-
-        _logger.info(
-            "updating ldap domain `%s` in sssd configuration file %s", name, _SSSD_CONFIG_FILE
-        )
-        diff = {
-            "ldap_uri": ",".join(data.urls),
-            "ldap_search_base": data.base_dn,
-            "ldap_default_bind_dn": data.bind_dn,
-            "ldap_default_authtok": data.bind_password,
-            "ldap_id_use_start_tls": "True" if data.starttls else "False",
-        }
-        domain_config_name = f"domain/{name}"
-        with self.edit() as config:
-            config[domain_config_name] = dict(config[domain_config_name]) | diff
+            config[domain_name] = existing | domain_config
 
     def remove_ldap_domain(self, name: str) -> None:
         """Remove an LDAP domain from the ``sssd`` service configuration.
