@@ -32,6 +32,6 @@ def check_sssd(observer: Observer) -> ops.StatusBase:
         return ops.WaitingStatus(f"Waiting for integrations: [`{LDAP_INTEGRATION_NAME}`]")
 
     if not observer.charm.sssd.service.is_active():
-        return ops.WaitingStatus("Waiting for `sssd` to start")
+        return ops.WaitingStatus("Waiting for SSSD to start")
 
     return ops.ActiveStatus()
