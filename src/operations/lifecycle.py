@@ -45,8 +45,6 @@ class LifecycleObserver(Observer):
         self.charm.unit.status = ops.MaintenanceStatus("Installing SSSD")
         try:
             self.charm.sssd.install()
-            self.charm.sssd.config.init()
-            self.charm.unit.set_workload_version(self.charm.sssd.version())
         except Error as e:
             _logger.exception(e.message)
             event.defer()
