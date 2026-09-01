@@ -193,7 +193,7 @@ class TestLdapObserver:
             assert state.unit_status == ops.WaitingStatus(
                 f"Waiting for integrations: [`{LDAP_INTEGRATION_NAME}`]"
             )
-            assert mock_charm.unit_status_history[1:] == [ops.MaintenanceStatus("Disabling SSSD")]
+            assert mock_charm.unit_status_history[1:] == [ops.MaintenanceStatus("Stopping SSSD")]
             mock_sssd.config.remove_ldap_domain.assert_called_once_with("glauth")
-            mock_sssd.service.disable.assert_called_once()
+            mock_sssd.service.stop.assert_called_once()
             mock_sssd.service.restart.assert_not_called()

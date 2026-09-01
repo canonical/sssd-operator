@@ -110,6 +110,6 @@ class LdapObserver(Observer):
             self.charm.unit.status = ops.MaintenanceStatus("Restarting SSSD")
             self.charm.sssd.service.restart()
         else:
-            _logger.info("no domains exist in sssd configuration. disabling sssd service")
-            self.charm.unit.status = ops.MaintenanceStatus("Disabling SSSD")
-            self.charm.sssd.service.disable()
+            _logger.info("no domains exist in sssd configuration. stopping the sssd service")
+            self.charm.unit.status = ops.MaintenanceStatus("Stopping SSSD")
+            self.charm.sssd.service.stop()

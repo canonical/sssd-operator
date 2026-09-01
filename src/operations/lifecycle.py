@@ -36,6 +36,7 @@ class LifecycleObserver(Observer):
     def __init__(self, charm: "SSSDCharm") -> None:
         super().__init__(charm)
         self.charm.framework.observe(self.charm.on.install, self._on_install)
+        self.charm.framework.observe(self.charm.on.start, self._on_start)
         self.charm.framework.observe(self.charm.on.stop, self._on_stop)
 
     @refresh
@@ -53,10 +54,18 @@ class LifecycleObserver(Observer):
                 ops.BlockedStatus("Failed to install SSSD. See `juju debug-log` for details")
             )
 
+    @refresh
+    def _on_start(self, _: ops.StartEvent) -> None:
+        """Handle when the SSSD charm is started up on the unit."""
+        self.charm.unit.status = ops.MaintenanceStatus("Initializing SSSD")
+        self.charm.unit.set_workload_version(self.charm.sssd.version())
+        self.charm.sssd.config.init()
+        self.charm.sssd.service.enable()
+
     def _on_stop(self, _: ops.StopEvent) -> None:
         """Handle when the SSSD unit is going to be torn down by Juju."""
-        self.charm.unit.status = ops.MaintenanceStatus("Disabling SSSD")
-        self.charm.sssd.service.disable()
+        self.charm.unit.status = ops.MaintenanceStatus("Stopping SSSD")
+        self.charm.sssd.service.stop()
         self.charm.unit.status = ops.MaintenanceStatus("Removing SSSD")
         self.charm.sssd.config.delete()
         self.charm.sssd.remove(purge=True)

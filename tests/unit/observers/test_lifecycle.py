@@ -31,16 +31,10 @@ class TestLifecycleObserver:
     def test_install(self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock) -> None:
         """Test the ``_on_install`` event handler."""
         # Test `install` hook reaches target state with no errors.
-        mock_sssd.version.return_value = "2.9.4-1.1ubuntu6.2"
         with mock_charm(mock_charm.on.install(), testing.State()) as manager:
             state = manager.run()
-            assert state.workload_version == "2.9.4-1.1ubuntu6.2"
-            assert state.unit_status == ops.WaitingStatus(
-                f"Waiting for integrations: [`{LDAP_INTEGRATION_NAME}`]"
-            )
             assert len(state.deferred) == 0
             mock_sssd.install.assert_called_once()
-            mock_sssd.config.init.assert_called_once()
 
         # Test `install` hook when `sssd` fails to install on machine.
         mock_charm.unit_status_history.clear()
@@ -54,15 +48,30 @@ class TestLifecycleObserver:
             assert len(state.deferred) == 1
             assert state.deferred[0].name == "install"
 
+    def test_start(self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock) -> None:
+        """Test the ``_on_start`` event handler."""
+        mock_sssd.version.return_value = "2.9.4"
+        with mock_charm(mock_charm.on.start(), testing.State()) as manager:
+            state = manager.run()
+            assert state.unit_status == ops.WaitingStatus(
+                f"Waiting for integrations: [`{LDAP_INTEGRATION_NAME}`]"
+            )
+            assert mock_charm.unit_status_history[1:] == [
+                ops.MaintenanceStatus("Initializing SSSD")
+            ]
+            assert state.workload_version == "2.9.4"
+            mock_sssd.service.enable.assert_called_once()
+            mock_sssd.config.init.assert_called_once()
+
     def test_stop(self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock) -> None:
         """Test the ``_on_stop`` event handler."""
         with mock_charm(mock_charm.on.stop(), testing.State()) as manager:
             state = manager.run()
             assert state.unit_status == ops.MaintenanceStatus("SSSD removed")
             assert mock_charm.unit_status_history[1:] == [
-                ops.MaintenanceStatus("Disabling SSSD"),
+                ops.MaintenanceStatus("Stopping SSSD"),
                 ops.MaintenanceStatus("Removing SSSD"),
             ]
-            mock_sssd.service.disable.assert_called_once()
+            mock_sssd.service.stop.assert_called_once()
             mock_sssd.config.delete.assert_called_once()
             mock_sssd.remove.assert_called_once_with(purge=True)
