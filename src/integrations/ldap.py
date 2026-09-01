@@ -59,7 +59,6 @@ class LdapObserver(Observer):
             LdapProviderData, self.ldap.consume_ldap_relation_data(relation=event.relation)
         )
         name = event.relation.app.name
-        domains = self.charm.sssd.config.domains()
 
         if data.starttls and not certificates_transfer_exists(self.charm).ok:
             _logger.warning(
@@ -78,27 +77,9 @@ class LdapObserver(Observer):
                 )
             )
 
-        if name not in domains:
-            self.charm.unit.status = ops.MaintenanceStatus(
-                f"Adding domain `{name}` to SSSD configuration"
-            )
-            self.charm.sssd.config.add_ldap_domain(name, data)
-        else:
-            self.charm.unit.status = ops.MaintenanceStatus(
-                f"Updating domain `{name}` in SSSD configuration"
-            )
-            self.charm.sssd.config.update_ldap_domain(name, data)
-
-        if len(domains) == 0:
-            _logger.info("first domain added to sssd configuration. enabling sssd service")
-            self.charm.unit.status = ops.MaintenanceStatus("Enabling SSSD")
-            self.charm.sssd.service.enable()
-            self.charm.unit.status = ops.MaintenanceStatus("Starting SSSD")
-            self.charm.sssd.service.restart()
-        else:
-            _logger.info("sssd configuration has been updated. restarting sssd service")
-            self.charm.unit.status = ops.MaintenanceStatus("Restarting SSSD")
-            self.charm.sssd.service.restart()
+        self.charm.unit.status = ops.MaintenanceStatus("Updating SSSD configuration")
+        self.charm.sssd.config.update_ldap_domain(name, data)
+        self.charm.sssd.service.restart()
 
     @refresh
     def _on_ldap_unavailable(self, event: LdapUnavailableEvent) -> None:
