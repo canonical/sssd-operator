@@ -7,21 +7,24 @@
 
 ## Summary of changes
 
-[//]: # (Please summarize your commits here. For any complex or contentious changes, please also provide justifications.)
+[//]: # (Please summarize your commits here. If AI was used to assist with making these changes, please describe how it was used.)
 
+
+#### Justification for changes
+
+[//]: # (Please provide justifications for your commits here.)
 
 
 #### Related Issues, PRs, and Discussions
 
-[//]: # (Please link to related issues, pull requests, and discussions here. If your PR has no related issues, PRs, or discussions, please provide a justification for this PR here instead.)
-
+[//]: # (Please link to related issues, pull requests, and discussions here.)
 
 
 ## Docs
 
 * [ ] I have created a pull request to add or update relevant documentation in [canonical/charmed-hpc-docs](https://github.com/canonical/charmed-hpc-docs) or another documentation location.
 
-[//]: # (If documentation has been updated or added in a location other than canonical/charmed-hpc-docs], please note the location here.)
+[//]: # (If documentation has been updated or added in a location other than canonical/charmed-hpc-docs, please note the location here.)
 
 Or:
 
