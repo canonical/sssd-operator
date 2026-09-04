@@ -316,6 +316,7 @@ Other rules:
 
 ## Further information
 
+- [Specification UHPC016 — Charm configuration observer](https://github.com/canonical/hpc-specs/blob/main/specs/UHPC%20016%20-%20Charm%20configuration%20observer/uhpc016.md)
 - [Specification UHPC010 — Observer design pattern in HPC charms](https://github.com/canonical/hpc-specs/blob/main/specs/UHPC%20010%20-%20Observer%20design%20pattern%20in%20HPC%20charms/uhpc010.md)
 - [Specification CC008 — Charm Terraform Standards](https://github.com/canonical/hpc-team/blob/main/.agents/skills/create-charm-terraform-module/SKILL.md)
 - [`charmed-hpc-libs`](https://github.com/canonical/charmed-hpc-libs) — shared charm primitives (`AptLifecycleManager`, `SystemctlServiceManager`, `Observer`, `leader`, `StopCharm`, `refresh`).
