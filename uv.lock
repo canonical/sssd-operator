@@ -30,11 +30,28 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+interfaces = [
+    { name = "ops" },
+]
 ops = [
     { name = "ops" },
     { name = "pydantic" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
+]
+
+[[package]]
+name = "charmed-openssh-ssh-config-interface"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "charmed-hpc-libs", extra = ["interfaces"] },
+    { name = "ops" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b6/ae/ab1794b31cf464cbb4597e62a5c275dea8f35c42e3a5fdff101efb15908c/charmed_openssh_ssh_config_interface-0.1.0.tar.gz", hash = "sha256:74478f49cdf6d4ea2c417aed4ccf36aab8d0a483422b8377004be7ea7e9ab800", size = 8764, upload-time = "2026-08-25T18:33:31.451Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/53/cd/7f644d4614457d98eee11f66d0e59b25bd9d9ee3170f8de4210edf5721d0/charmed_openssh_ssh_config_interface-0.1.0-py3-none-any.whl", hash = "sha256:6c05626c7e73ad1151f5317a0987e65755ad1540529aa9e8451f4e407f4d6cd8", size = 12568, upload-time = "2026-08-25T18:33:30.286Z" },
 ]
 
 [[package]]
@@ -655,6 +672,7 @@ version = "0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "charmed-hpc-libs", extra = ["ops"] },
+    { name = "charmed-openssh-ssh-config-interface" },
     { name = "charmlibs-interfaces-certificate-transfer" },
     { name = "charmlibs-interfaces-ldap" },
     { name = "jsonschema" },
@@ -679,6 +697,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "charmed-hpc-libs", extras = ["ops"], specifier = "~=0.7" },
+    { name = "charmed-openssh-ssh-config-interface", specifier = "~=0.1" },
     { name = "charmlibs-interfaces-certificate-transfer", specifier = "~=1.0" },
     { name = "charmlibs-interfaces-ldap", specifier = "~=1.0" },
     { name = "codespell", marker = "extra == 'dev'" },
