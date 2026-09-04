@@ -19,7 +19,7 @@ from ops import testing
 
 import sssd
 from charm import SSSDCharm
-from integrations import CertificateTransferObserver, LdapObserver
+from integrations import CertificateTransferObserver, LdapObserver, SSHConfigObserver
 from operations import LifecycleObserver
 
 
@@ -27,8 +27,9 @@ def test_charm_wiring() -> None:
     """Test that ``SSSDCharm.__init__`` wires the workload manager and observers.
 
     ``SSSDCharm`` is an entrypoint only - it must instantiate the ``SSSDManager``
-    workload manager and the three observers (``LdapObserver``,
-    ``CertificateTransferObserver``, ``LifecycleObserver``) and nothing else.
+    workload manager and the four observers (``LdapObserver``,
+    ``CertificateTransferObserver``, ``SSHConfigObserver``, ``LifecycleObserver``)
+    and nothing else.
     """
     ctx = testing.Context(SSSDCharm)
     with ctx(ctx.on.update_status(), testing.State()) as manager:
@@ -36,6 +37,7 @@ def test_charm_wiring() -> None:
         assert isinstance(charm.sssd, sssd.SSSDManager)
         assert isinstance(charm.ldap, LdapObserver)
         assert isinstance(charm.certificates, CertificateTransferObserver)
+        assert isinstance(charm.ssh_config, SSHConfigObserver)
         assert isinstance(charm.lifecycle, LifecycleObserver)
 
         assert not any(
