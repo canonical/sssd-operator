@@ -317,7 +317,6 @@ Other rules:
 ## Further information
 
 - [Specification UHPC010 — Observer design pattern in HPC charms](https://github.com/canonical/hpc-specs/blob/main/specs/UHPC%20010%20-%20Observer%20design%20pattern%20in%20HPC%20charms/uhpc010.md)
-- [Specification UHPC009 — Distributing Slurm interfaces as Python packages](https://github.com/canonical/hpc-specs/blob/main/specs/UHPC%20009%20-%20Distributing%20Slurm%20interfaces%20as%20Python%20packages/uhpc009.md)
 - [Specification CC008 — Charm Terraform Standards](https://github.com/canonical/hpc-team/blob/main/.agents/skills/create-charm-terraform-module/SKILL.md)
 - [`charmed-hpc-libs`](https://github.com/canonical/charmed-hpc-libs) — shared charm primitives (`AptLifecycleManager`, `SystemctlServiceManager`, `Observer`, `leader`, `StopCharm`, `refresh`).
 - [`charmlibs`](https://github.com/canonical/charmlibs) — integration interface packages (`charmlibs.interfaces.ldap`, `charmlibs.interfaces.certificate_transfer`).
