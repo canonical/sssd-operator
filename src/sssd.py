@@ -41,7 +41,7 @@ class SSSDConfigManager:
 
     def init(self) -> None:
         """Initialize the ``sssd.conf`` service configuration file."""
-        _logger.info("seeding initial sssd configuration file at %s", _SSSD_CONFIG_FILE)
+        _logger.info("initializing sssd configuration file at %s", _SSSD_CONFIG_FILE)
         with self.edit() as config:
             config["sssd"] = {"config_file_version": "2"}
 

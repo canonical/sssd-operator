@@ -14,7 +14,8 @@
 
 """Integration observers for the SSSD charm."""
 
-__all__ = ["CertificateTransferObserver", "LdapObserver"]
+__all__ = ["CertificateTransferObserver", "LdapObserver", "SSHConfigObserver"]
 
 from .certificate_transfer import CertificateTransferObserver
 from .ldap import LdapObserver
+from .ssh_config import SSHConfigObserver

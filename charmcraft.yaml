@@ -63,3 +63,9 @@ requires:
     description: |
       Receive CA certificates from charmed operators.
     interface: certificate_transfer
+
+provides:
+  ssh-config:
+    description: |
+      Provide SSH daemon configuration to charmed operators such as `openssh`.
+    interface: ssh_config

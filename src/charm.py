@@ -17,7 +17,7 @@
 
 import ops
 
-from integrations import CertificateTransferObserver, LdapObserver
+from integrations import CertificateTransferObserver, LdapObserver, SSHConfigObserver
 from operations import LifecycleObserver
 from sssd import SSSDManager
 
@@ -31,8 +31,9 @@ class SSSDCharm(ops.CharmBase):
         self.sssd = SSSDManager()
         self.lifecycle = LifecycleObserver(self)
 
-        self.ldap = LdapObserver(self)
         self.certificates = CertificateTransferObserver(self)
+        self.ldap = LdapObserver(self)
+        self.ssh_config = SSHConfigObserver(self)
 
 
 if __name__ == "__main__":  # pragma: nocover
