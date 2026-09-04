@@ -25,3 +25,10 @@ output "requires" {
     receive-ca-cert = "receive-ca-cert"
   }
 }
+
+output "provides" {
+  description = "Map of provides endpoint names"
+  value = {
+    ssh-config = "ssh-config"
+  }
+}

@@ -31,6 +31,7 @@ for the Juju Terraform provider.
 |---------------|------------------------------------------|
 | `application` | The deployed `juju_application` resource |
 | `requires`    | Map of `requires` endpoint names         |
+| `provides`    | Map of `provides` endpoint names         |
 
 The `requires` output exposes the following endpoint names:
 
@@ -39,6 +40,12 @@ The `requires` output exposes the following endpoint names:
 | `juju-info`       | `juju-info`       |
 | `ldap`            | `ldap`            |
 | `receive-ca-cert` | `receive-ca-cert` |
+
+The `provides` output exposes the following endpoint names:
+
+| Key          | Endpoint name |
+|--------------|---------------|
+| `ssh-config` | `ssh-config`  |
 
 ## Usage
 
