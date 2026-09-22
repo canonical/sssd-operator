@@ -59,7 +59,7 @@ def configure_ldap_integrator(context: Context) -> None:
     sssd_model.config(
         LDAP_INTEGRATOR_APP_NAME,
         {
-            "urls": f"ldap://{ldap_server_address},ldaps://{ldap_server_address}",
+            "urls": f"ldap://{ldap_server_address}",
             "base_dn": "dc=test,dc=ubuntu,dc=com",
             "starttls": False,
             "bind_dn": "cn=admin,dc=test,dc=ubuntu,dc=com",

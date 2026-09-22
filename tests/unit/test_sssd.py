@@ -21,6 +21,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+from charmlibs.interfaces.ldap import LdapProviderData
 from pyfakefs.fake_filesystem import FakeFilesystem
 from pyfakefs.helpers import set_gid, set_uid
 from pytest_mock import MockerFixture
@@ -136,16 +137,19 @@ class TestSSSDConfigmanager:
         fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_FULL_SSSD_CONFIG)
         assert SSSDConfigManager().domains() == ["ldap"]
 
-    def test_update_ldap_domain(self, mocker: MockerFixture, fs: FakeFilesystem) -> None:
+    def test_update_ldap_domain(self, fs: FakeFilesystem) -> None:
         """Test the ``update_ldap_domain()`` method."""
         fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_FULL_SSSD_CONFIG)
 
-        ldap_data = mocker.MagicMock()
-        ldap_data.urls = ["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"]
-        ldap_data.base_dn = "dc=glauth,dc=com"
-        ldap_data.bind_dn = "cn=sssd,ou=sssd,dc=glauth,dc=com"
-        ldap_data.bind_password = "supersecret"
-        ldap_data.starttls = False
+        ldap_data = LdapProviderData(
+            urls=["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"],
+            ldaps_urls=[],
+            base_dn="dc=glauth,dc=com",
+            starttls=False,
+            bind_dn="cn=sssd,ou=sssd,dc=glauth,dc=com",
+            bind_password="supersecret",
+            auth_method="simple",
+        )
 
         # Test when `ldap` domain is already in `sssd.conf`.
         SSSDConfigManager().update_ldap_domain("ldap", ldap_data)
@@ -154,6 +158,38 @@ class TestSSSDConfigmanager:
             "id_provider": "ldap",
             "auth_provider": "ldap",
             "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
+            "ldap_search_base": "dc=glauth,dc=com",
+            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=glauth,dc=com",
+            "ldap_default_authtok_type": "password",
+            "ldap_default_authtok": "supersecret",
+            "ldap_use_tokengroups": "False",
+            "ldap_group_member": "member",
+            "ldap_schema": "rfc2307bis",
+            "ldap_id_use_start_tls": "False",
+            "cache_credentials": "True",
+        }
+        assert SSSDConfigManager().domains() == ["ldap"]
+
+        fs.reset()
+        fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_SEEDED_SSSD_CONFIG)
+
+        # Test when the provider has published LDAPS URLs: they take precedence over the
+        # plaintext URLs and StartTLS is disabled since the connection is already encrypted.
+        ldap_data_ldaps = LdapProviderData(
+            urls=["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"],
+            ldaps_urls=["ldaps://10.0.0.128:636", "ldaps://10.0.0.129:636"],
+            base_dn="dc=glauth,dc=com",
+            starttls=True,
+            bind_dn="cn=sssd,ou=sssd,dc=glauth,dc=com",
+            bind_password="supersecret",
+            auth_method="simple",
+        )
+        SSSDConfigManager().update_ldap_domain("ldap", ldap_data_ldaps)
+        config = SSSDConfigManager().read()
+        assert dict(config["domain/ldap"]) == {
+            "id_provider": "ldap",
+            "auth_provider": "ldap",
+            "ldap_uri": "ldaps://10.0.0.128:636,ldaps://10.0.0.129:636",
             "ldap_search_base": "dc=glauth,dc=com",
             "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=glauth,dc=com",
             "ldap_default_authtok_type": "password",
@@ -188,7 +224,7 @@ class TestSSSDConfigmanager:
         }
         assert SSSDConfigManager().domains() == ["polaris"]
 
-    def test_remove_ldap_domain(self, mocker: MockerFixture, fs: FakeFilesystem) -> None:
+    def test_remove_ldap_domain(self, fs: FakeFilesystem) -> None:
         """Test the ``remove_ldap_domain()`` method."""
         fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_FULL_SSSD_CONFIG)
 
@@ -205,12 +241,15 @@ class TestSSSDConfigmanager:
         # Test when there are multiple domains in `sssd.conf`.
         fs.reset()
         fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_FULL_SSSD_CONFIG)
-        ldap_data = mocker.MagicMock()
-        ldap_data.urls = ["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"]
-        ldap_data.base_dn = "dc=glauth,dc=com"
-        ldap_data.bind_dn = "cn=sssd,ou=sssd,dc=glauth,dc=com"
-        ldap_data.bind_password = "supersecret"
-        ldap_data.starttls = True
+        ldap_data = LdapProviderData(
+            urls=["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"],
+            ldaps_urls=[],
+            base_dn="dc=glauth,dc=com",
+            starttls=True,
+            bind_dn="cn=sssd,ou=sssd,dc=glauth,dc=com",
+            bind_password="supersecret",
+            auth_method="simple",
+        )
 
         SSSDConfigManager().update_ldap_domain("polaris", ldap_data)
         SSSDConfigManager().remove_ldap_domain("ldap")
