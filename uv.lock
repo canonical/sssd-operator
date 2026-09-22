@@ -69,15 +69,15 @@ wheels = [
 
 [[package]]
 name = "charmlibs-interfaces-ldap"
-version = "1.0.0"
+version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ops" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/e0/3af3c1fe8e717d043c15ddee9605935f5b06cd8d32052c4044d19244fe3c/charmlibs_interfaces_ldap-1.0.0.tar.gz", hash = "sha256:6c88330a86fbebfc7d5cc48294f9254f0944c37229ec166534c09572597f58db", size = 30538, upload-time = "2026-07-28T06:01:54.499Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/12/d8/0c6488839e95ca112d619160f9bf24baf2408f6e847acfae4a88f58daf92/charmlibs_interfaces_ldap-1.1.0.tar.gz", hash = "sha256:07b519a4740d4009c664caefd873f4363e987ad2d48287a0537db3b9a00c126f", size = 31185, upload-time = "2026-09-11T09:38:48.537Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/ed/39506092129dd5fae075cee87898b123ccda475b957c3930169e63e1a666/charmlibs_interfaces_ldap-1.0.0-py3-none-any.whl", hash = "sha256:cd8bd1d841a3b8c606bd0e47113f3f40a3c410976f84b4d884f07ef4cebcd572", size = 7411, upload-time = "2026-07-28T06:01:53.265Z" },
+    { url = "https://files.pythonhosted.org/packages/44/e7/4e88c9254b6fa29f13089d54e1b3044054e2da231eda700cbd907f923636/charmlibs_interfaces_ldap-1.1.0-py3-none-any.whl", hash = "sha256:aa7e5f590ef95d78eb8f7abeb4d1a186da8a9a92b3700fe52909a6d3b97a0fe1", size = 7458, upload-time = "2026-09-11T09:38:47.435Z" },
 ]
 
 [[package]]
@@ -483,15 +483,15 @@ wheels = [
 
 [[package]]
 name = "pytest-jubilant-bdd"
-version = "0.9.0"
+version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jubilant" },
     { name = "pytest-bdd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ee/10/282683c1625b3ba81057245cccdc8f706e97b102d143798442644c59df70/pytest_jubilant_bdd-0.9.0.tar.gz", hash = "sha256:02c2f28201d6db9042b359d6b757b423cae4bc275b74e8843bbf2aeed5f45517", size = 21012, upload-time = "2026-08-25T16:42:46.948Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/2f/b43976f1fec72aebb3ae750eb17876777fba7e949ebd6d4608f9cb3fc9cd/pytest_jubilant_bdd-0.12.0.tar.gz", hash = "sha256:740a3bf2be42d2caa0ed13163224d4d34700c3da95fe83d1dd9bae834c3301d2", size = 22873, upload-time = "2026-09-15T19:55:48.336Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/28/ee/406fc29718c64652f0a8118976ad63cc226e406d4f305339428879b4178d/pytest_jubilant_bdd-0.9.0-py3-none-any.whl", hash = "sha256:3a7423561538aac65c076f6059223a5687b5ed01fc6d4a1a5f1b9fdc7a4bdc06", size = 23902, upload-time = "2026-08-25T16:42:46.023Z" },
+    { url = "https://files.pythonhosted.org/packages/39/c9/d0691d9c0c1ac27f02954e4c6290202c2a9f65a5a6510570fc7d30e537f6/pytest_jubilant_bdd-0.12.0-py3-none-any.whl", hash = "sha256:7c0e3f3e55f1f14b98e43ee135b9704bbe3cabe05172a5f74fff8c2711ad8fc6", size = 25724, upload-time = "2026-09-15T19:55:47.257Z" },
 ]
 
 [[package]]
@@ -699,17 +699,17 @@ requires-dist = [
     { name = "charmed-hpc-libs", extras = ["ops"], specifier = "~=0.7" },
     { name = "charmed-openssh-ssh-config-interface", specifier = "~=0.1" },
     { name = "charmlibs-interfaces-certificate-transfer", specifier = "~=1.0" },
-    { name = "charmlibs-interfaces-ldap", specifier = "~=1.0" },
+    { name = "charmlibs-interfaces-ldap", specifier = "~=1.1" },
     { name = "codespell", marker = "extra == 'dev'" },
-    { name = "coverage", extras = ["toml"], marker = "extra == 'dev'", specifier = "~=7.15" },
+    { name = "coverage", extras = ["toml"], marker = "extra == 'dev'", specifier = "~=7.16" },
     { name = "jsonschema" },
     { name = "ops", specifier = "~=3.8" },
     { name = "ops", extras = ["testing"], marker = "extra == 'dev'", specifier = "~=3.8" },
-    { name = "pydantic", specifier = ">=2.13.4" },
+    { name = "pydantic", specifier = ">=2.13.5" },
     { name = "pyfakefs", marker = "extra == 'dev'", specifier = "~=6.2" },
     { name = "pyright", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "~=9.1" },
-    { name = "pytest-jubilant-bdd", marker = "extra == 'dev'", specifier = "~=0.8" },
+    { name = "pytest-jubilant-bdd", marker = "extra == 'dev'", specifier = "~=0.12" },
     { name = "pytest-mock", marker = "extra == 'dev'", specifier = "~=3.15" },
     { name = "pytest-order", marker = "extra == 'dev'", specifier = "~=1.5" },
     { name = "ruff", marker = "extra == 'dev'" },
