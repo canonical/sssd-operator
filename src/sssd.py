@@ -87,7 +87,10 @@ class SSSDConfigManager:
 
         Notes:
             This method will add a new LDAP domain to the ``sssd`` service configuration
-            if it does not exist within the current service configuration.
+            if it does not exist within the current service configuration. When
+            ``data.ldaps_enabled`` is ``True``, the LDAPS URLs published by the provider
+            take precedence over the plaintext URLs and StartTLS is disabled, since the
+            LDAPS connection is already TLS-encrypted.
         """
         domains = self.domains()
         if not domains:  # There are no existing domains.
@@ -99,7 +102,7 @@ class SSSDConfigManager:
         domain_config = {
             "id_provider": "ldap",
             "auth_provider": "ldap",
-            "ldap_uri": ",".join(data.urls),
+            "ldap_uri": ",".join(data.ldaps_urls if data.ldaps_enabled else data.urls),
             "ldap_search_base": data.base_dn,
             "ldap_default_bind_dn": data.bind_dn,
             "ldap_default_authtok_type": "password",
@@ -107,7 +110,9 @@ class SSSDConfigManager:
             "ldap_use_tokengroups": "False",
             "ldap_group_member": "member",
             "ldap_schema": "rfc2307bis",
-            "ldap_id_use_start_tls": "True" if data.starttls else "False",
+            "ldap_id_use_start_tls": "True"
+            if data.starttls and not data.ldaps_enabled
+            else "False",
             "cache_credentials": "True",
         }
 

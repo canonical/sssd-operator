@@ -60,12 +60,15 @@ class LdapObserver(Observer):
         )
         name = event.relation.app.name
 
-        if data.starttls and not certificates_transfer_exists(self.charm).ok:
+        if (data.starttls or data.ldaps_enabled) and not certificates_transfer_exists(
+            self.charm
+        ).ok:
             _logger.warning(
                 (
-                    "ldap domain `%s` has starttls enabled, but the %s integration is missing. "
-                    + "cannot add domain to sssd configuration until the domain's tls "
-                    + "certificates are provided. deferring until tls certificates are provided"
+                    "ldap domain `%s` has starttls or ldaps enabled, but the %s integration "
+                    + "is missing. cannot add domain to sssd configuration until the domain's "
+                    + "tls certificates are provided. deferring until tls certificates are "
+                    + "provided"
                 ),
                 name,
                 CERTIFICATES_TRANSFER_INTEGRATION_NAME,

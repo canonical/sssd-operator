@@ -19,6 +19,7 @@ import json
 from unittest.mock import Mock
 
 import ops
+import pytest
 from charmlibs.interfaces.ldap import LdapProviderData
 from ops import testing
 
@@ -29,7 +30,24 @@ from constants import CERTIFICATES_TRANSFER_INTEGRATION_NAME, LDAP_INTEGRATION_N
 class TestLdapObserver:
     """Test the ``ldap`` integration event observer."""
 
-    def test_ldap_ready(self, mock_charm: testing.Context[SSSDCharm], mock_sssd: Mock) -> None:
+    @pytest.mark.parametrize(
+        ("ldap_remote_app_name", "ldaps_urls", "starttls"),
+        [
+            # LDAP with StartTLS. For example, if SSSD is integrated with ldap-integrator.
+            ("glauth", [], "True"),
+            # LDAPS. For example, if SSSD is integrated with the Authentik LDAP outpost.
+            ("authentik", ["ldaps://10.0.0.128:636"], "False"),
+        ],
+        ids=["starttls", "ldaps"],
+    )
+    def test_ldap_ready(
+        self,
+        mock_charm: testing.Context[SSSDCharm],
+        mock_sssd: Mock,
+        ldap_remote_app_name: str,
+        ldaps_urls: list[str],
+        starttls: str,
+    ) -> None:
         """Test the ``_on_ldap_ready`` event handler."""
         receive_ca_cert_relation = testing.Relation(
             endpoint=CERTIFICATES_TRANSFER_INTEGRATION_NAME,
@@ -39,15 +57,15 @@ class TestLdapObserver:
 
         ldap_secret_password = "super-secret-bind-password"
         ldap_secret = testing.Secret(tracked_content={"password": ldap_secret_password})
-        ldap_remote_app_name = "glauth"
         ldap_remote_app_data = {
             "urls": json.dumps(["ldap://10.0.0.128:3893"]),
-            "ldaps_urls": json.dumps([]),
+            "ldaps_urls": json.dumps(ldaps_urls),
+            "ldaps_enabled": "true" if ldaps_urls else "false",
             "base_dn": "dc=ubuntu,dc=com",
             "bind_dn": "cn=app,ou=model,dc=ubuntu,dc=com",
             "bind_password_secret": ldap_secret.id,
             "auth_method": "simple",
-            "starttls": "True",
+            "starttls": starttls,
         }
         mock_client_side_provider_data = LdapProviderData(
             **(ldap_remote_app_data | {"bind_password": ldap_secret_password})
@@ -73,8 +91,8 @@ class TestLdapObserver:
         mock_charm.unit_status_history.clear()
         mock_charm.emitted_events.clear()
 
-        # Test `ldap_ready` hook when starttls is enabled but `certificate_transfer`
-        # integration does not exist.
+        # Test `ldap_ready` hook when tls (starttls or ldaps) is enabled but the
+        # `certificate_transfer` integration does not exist.
         with mock_charm(
             mock_charm.on.relation_changed(ldap_relation),
             testing.State(relations={ldap_relation}, secrets={ldap_secret}),
