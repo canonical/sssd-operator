@@ -71,5 +71,5 @@ def configure_ldap_integrator(context: Context) -> None:
 @then(parsers.re("the output should be '(?P<expected>[^']*)'"))
 def assert_output(context: Context, expected: str) -> None:
     """Assert the most recent exec result matches the expected output."""
-    task = context.exec_results.peek()
+    task = context.exec_results.pop()
     assert task.stdout.strip() == expected
