@@ -40,11 +40,31 @@ write_files:
     loginShell: /bin/bash
     homeDirectory: /home/nucci
 
+    dn: uid=bigfoot,ou=People,dc=test,dc=ubuntu,dc=com
+    uid: bigfoot
+    objectClass: inetOrgPerson
+    objectClass: posixAccount
+    cn: bigfoot
+    sn: bigfoot
+    givenName: bigfoot
+    mail: bigfoot@example.com
+    userPassword: isawbigfootandhegavemealittlekiss
+    uidNumber: 10001
+    gidNumber: 10001
+    loginShell: /bin/bash
+    homeDirectory: /home/bigfoot
+
     dn: cn=nucci,ou=Groups,dc=test,dc=ubuntu,dc=com
     cn: nucci
     objectClass: posixGroup
     gidNumber: 10000
     memberUid: nucci
+
+    dn: cn=bigfoot,ou=Groups,dc=test,dc=ubuntu,dc=com
+    cn: bigfoot
+    objectClass: posixGroup
+    gidNumber: 10001
+    memberUid: bigfoot
 
     dn: cn=research,ou=Groups,dc=test,dc=ubuntu,dc=com
     cn: research
