@@ -147,15 +147,28 @@ class SSSDConfigManager:
         _logger.info(
             "removing ldap domain `%s` from sssd configuration file %s", name, _SSSD_CONFIG_FILE
         )
-        with self.edit() as config:
-            domains_ = config["sssd"]["domains"].split(",")
-            domains_.remove(name)
-            if domains_:
-                config["sssd"]["domains"] = ",".join(domains_)
-            else:
-                del config["sssd"]["domains"]
 
-            del config[f"domain/{name}"]
+        domains = self.domains()
+        try:
+            domains.remove(name)
+        except ValueError:
+            _logger.warning("ldap domain `%s` is not defined in the current domain list", name)
+
+        with self.edit() as config:
+            if domains:
+                config["sssd"]["domains"] = ",".join(domains)
+            else:
+                config.remove_option("sssd", "domains")
+
+            if config.remove_section(f"domain/{name}"):
+                _logger.info("configuration for ldap domain `%s` successfully removed")
+            else:
+                _logger.warning(
+                    "skipping deletion of configuration for ldap domain `%s`. "
+                    "domain configuration was not defined in the sssd configuration file %s",
+                    name,
+                    _SSSD_CONFIG_FILE,
+                )
 
 
 class SSSDManager(AptLifecycleManager):

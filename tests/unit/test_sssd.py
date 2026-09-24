@@ -255,6 +255,12 @@ class TestSSSDConfigmanager:
         SSSDConfigManager().remove_ldap_domain("ldap")
         assert len(SSSDConfigManager().domains()) == 1
 
+        # Test when there are no domains in `sssd.conf`
+        fs.reset()
+        fs.create_file("/etc/sssd/sssd.conf", contents=MOCK_SEEDED_SSSD_CONFIG)
+        SSSDConfigManager().remove_ldap_domain("polaris")
+        assert len(SSSDConfigManager().domains()) == 0
+
 
 class TestSSSDManager:
     """Test the ``SSSDManager`` class."""
