@@ -29,3 +29,11 @@ Feature: Functional edge tests
     And 'sssd' is integrated with 'ldap-integrator'
     When I execute 'getent passwd nucci' on unit 'sssd/0'
     Then the output should be 'nucci:*:10000:10000:nucci:/home/nucci:/bin/bash'
+  Scenario: Disintegrate SSSD with an LDAP server
+    Given 'sssd' is deployed
+    And 'ldap-integrator' is deployed
+    And 'sssd' is integrated with 'ldap-integrator'
+    And I disintegrate 'sssd:ldap' and 'ldap-integrator:ldap'
+    And all agents are 'idle'
+    When I execute 'getent passwd bigfoot' on unit 'sssd/0'
+    Then the output should be ''
