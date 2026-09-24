@@ -76,7 +76,9 @@ class SSSDConfigManager:
         """Get list of configured sssd domains."""
         config = self.read()
         domains_ = config["sssd"].get("domains", "")
-        return domains_.split(",") if domains_ else []
+        domains_ = domains_.split(",") if domains_ else []
+        _logger.debug("current ldap domains: `%s`", domains_)
+        return domains_
 
     def update_ldap_domain(self, name: str, data: LdapProviderData) -> None:
         """Update an LDAP domain in the ``sssd`` service configuration.
