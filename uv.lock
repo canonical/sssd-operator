@@ -483,15 +483,15 @@ wheels = [
 
 [[package]]
 name = "pytest-jubilant-bdd"
-version = "0.12.0"
+version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jubilant" },
     { name = "pytest-bdd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f3/2f/b43976f1fec72aebb3ae750eb17876777fba7e949ebd6d4608f9cb3fc9cd/pytest_jubilant_bdd-0.12.0.tar.gz", hash = "sha256:740a3bf2be42d2caa0ed13163224d4d34700c3da95fe83d1dd9bae834c3301d2", size = 22873, upload-time = "2026-09-15T19:55:48.336Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/56/c5/a0c8314adf2986cbb4145da9d6525a9daafd6a1009ff8fba8246f949b707/pytest_jubilant_bdd-0.14.0.tar.gz", hash = "sha256:2f4e0878a0311c4b9e0c4c9feed1545126dd109576fb795e6b5ae6d896754230", size = 75874, upload-time = "2026-09-24T18:36:05.742Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/39/c9/d0691d9c0c1ac27f02954e4c6290202c2a9f65a5a6510570fc7d30e537f6/pytest_jubilant_bdd-0.12.0-py3-none-any.whl", hash = "sha256:7c0e3f3e55f1f14b98e43ee135b9704bbe3cabe05172a5f74fff8c2711ad8fc6", size = 25724, upload-time = "2026-09-15T19:55:47.257Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/bd/cc52e4b1181e768f7cb7cfc990ddabedda86179ff72ff3eaf8ac3163327f/pytest_jubilant_bdd-0.14.0-py3-none-any.whl", hash = "sha256:fa5ad5488070d01d0d6c0e7be4a09bd08ccfb6e2c8d8a8e61a4f2422792a6068", size = 26254, upload-time = "2026-09-24T18:36:04.746Z" },
 ]
 
 [[package]]
@@ -709,7 +709,7 @@ requires-dist = [
     { name = "pyfakefs", marker = "extra == 'dev'", specifier = "~=6.2" },
     { name = "pyright", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "~=9.1" },
-    { name = "pytest-jubilant-bdd", marker = "extra == 'dev'", specifier = "~=0.12" },
+    { name = "pytest-jubilant-bdd", marker = "extra == 'dev'", specifier = "~=0.14" },
     { name = "pytest-mock", marker = "extra == 'dev'", specifier = "~=3.15" },
     { name = "pytest-order", marker = "extra == 'dev'", specifier = "~=1.5" },
     { name = "ruff", marker = "extra == 'dev'" },
