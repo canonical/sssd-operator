@@ -20,7 +20,7 @@ dependencies = [
     "ops ~= 3.8",
     "jsonschema",
     "pydantic>=2.13.5",
-    "charmed-hpc-libs[ops] ~= 0.7",
+    "charmed-hpc-libs[ops] ~= 0.8",
     "charmed-openssh-ssh-config-interface ~= 0.1",
     "charmlibs-interfaces-certificate-transfer ~= 1.0",
     "charmlibs-interfaces-ldap ~= 1.1",
