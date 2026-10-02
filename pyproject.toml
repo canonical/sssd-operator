@@ -35,7 +35,7 @@ dev = [
     "pytest ~= 9.1",
     "pytest-mock ~= 3.16",
     "pytest-order ~= 1.5",
-    "pytest-jubilant-bdd ~= 0.14",
+    "pytest-jubilant-bdd ~= 0.16",
 
     # Linting
     "ruff",
