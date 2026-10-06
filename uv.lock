@@ -22,11 +22,11 @@ wheels = [
 
 [[package]]
 name = "charmed-hpc-libs"
-version = "0.7.1"
+version = "0.8.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e3/97/e6e002e36ee99da5e23b5da74e77c06db9bd0629b5ffab778881cc0db480/charmed_hpc_libs-0.7.1.tar.gz", hash = "sha256:010d550f2b5cf1ff8dfbb0b01426b9b66deb4071865ace8370c82de005fee04c", size = 64499, upload-time = "2026-08-19T19:38:05.146Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/51/62/a1c1fd103e5679999141a91b06db5a64ef5e83dffdd12c247936d7be1dd7/charmed_hpc_libs-0.8.0.tar.gz", hash = "sha256:06db380a3bed62ee3fe558750afc0b6ffda7b67f6aa0b36b542a039631b64990", size = 64467, upload-time = "2026-09-25T14:48:35.504Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/19/47/31788cd09344bc522414344549167ff81dc0fc94b3aa3968c31ce0bb4478/charmed_hpc_libs-0.7.1-py3-none-any.whl", hash = "sha256:a24bb20bf8e510d734f2dea5f6156e736d8c18c0ef778bed8bc218a34d011e87", size = 33938, upload-time = "2026-08-19T19:38:03.981Z" },
+    { url = "https://files.pythonhosted.org/packages/13/15/c3b63ee2cbf3301e3c1b74ebf8eb291cac5bc722086462c942efaf5baf9e/charmed_hpc_libs-0.8.0-py3-none-any.whl", hash = "sha256:c7a714ee7a67a8151e05432756b33828c3bd0abfb79491f6f53fb04d14d25628", size = 33959, upload-time = "2026-09-25T14:48:34.471Z" },
 ]
 
 [package.optional-dependencies]
@@ -226,14 +226,14 @@ wheels = [
 
 [[package]]
 name = "mako"
-version = "1.4.1"
+version = "1.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markupsafe" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2a/12/b5fa2353e2754cd67fb9f83793fa48ff42c213a5da7e719869d2301f6ab8/mako-1.4.1.tar.gz", hash = "sha256:d7904710b662996425a21627710c4777c45053146942cf8a7aebf757c92b8c27", size = 410165, upload-time = "2026-08-05T06:10:56.611Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/05/7f/0b891a82379ffd96d2d8cc6d435fb1055cdaed52829287f81d2a43fd71cb/mako-1.4.2.tar.gz", hash = "sha256:7227a060ee3af55a493af61d73d6beef13044b81dba9586736c13945f09464ce", size = 412231, upload-time = "2026-09-22T20:40:55.06Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/54/12ed58d458474aaab5c3d180173e745a4fe131bb330370596876d19ff60f/mako-1.4.1-py3-none-any.whl", hash = "sha256:a359d9a94a541213958742b2698d0a7757bb83551767bc468a74b9905aba9617", size = 80010, upload-time = "2026-08-05T06:10:58.248Z" },
+    { url = "https://files.pythonhosted.org/packages/f0/bb/0e4c30a18858adebc75496ea8a8c3fb65cbf4b36ea1c5028ed8a0a5fa196/mako-1.4.2-py3-none-any.whl", hash = "sha256:e70a2a4308952b33a21208bfd6725da79fae5a8c224578f8cfdeb60e5ace03df", size = 80163, upload-time = "2026-09-22T20:40:56.423Z" },
 ]
 
 [[package]]
@@ -483,27 +483,27 @@ wheels = [
 
 [[package]]
 name = "pytest-jubilant-bdd"
-version = "0.14.0"
+version = "0.17.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jubilant" },
     { name = "pytest-bdd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/56/c5/a0c8314adf2986cbb4145da9d6525a9daafd6a1009ff8fba8246f949b707/pytest_jubilant_bdd-0.14.0.tar.gz", hash = "sha256:2f4e0878a0311c4b9e0c4c9feed1545126dd109576fb795e6b5ae6d896754230", size = 75874, upload-time = "2026-09-24T18:36:05.742Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f6/e1/2705448c5f475ca0585c4681a104f5bb44c54d4faa67a46205ddcf2e688c/pytest_jubilant_bdd-0.17.0.tar.gz", hash = "sha256:db871a81a4904d5ea5ec0a08dd4084cc020a148eb0808f80ddf304b5da08af70", size = 79874, upload-time = "2026-10-01T18:40:19.845Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1d/bd/cc52e4b1181e768f7cb7cfc990ddabedda86179ff72ff3eaf8ac3163327f/pytest_jubilant_bdd-0.14.0-py3-none-any.whl", hash = "sha256:fa5ad5488070d01d0d6c0e7be4a09bd08ccfb6e2c8d8a8e61a4f2422792a6068", size = 26254, upload-time = "2026-09-24T18:36:04.746Z" },
+    { url = "https://files.pythonhosted.org/packages/14/60/b4fcdaaa57cd1f64a5b9e62fc5c73fa4a1a74bc09f0efa57f7a7484ca752/pytest_jubilant_bdd-0.17.0-py3-none-any.whl", hash = "sha256:dae2cd98fbd64034afd04d7d2a6907f87d3e56c13a57e3f7eaec43cf1dade11f", size = 28069, upload-time = "2026-10-01T18:40:18.804Z" },
 ]
 
 [[package]]
 name = "pytest-mock"
-version = "3.15.1"
+version = "3.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/68/14/eb014d26be205d38ad5ad20d9a80f7d201472e08167f0bb4361e251084a9/pytest_mock-3.15.1.tar.gz", hash = "sha256:1849a238f6f396da19762269de72cb1814ab44416fa73a8686deac10b0d87a0f", size = 34036, upload-time = "2025-09-16T16:37:27.081Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7a/7f/6ed29931d5c8cd396e7c0a55412e6cc88020373365c8685985dea53d26d7/pytest_mock-3.16.0.tar.gz", hash = "sha256:5a8395528b8f498205f3718f575228d0edaed7425fff638f87d1a6c3e0383636", size = 35362, upload-time = "2026-09-27T14:57:55.46Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/cc/06253936f4a7fa2e0f48dfe6d851d9c56df896a9ab09ac019d70b760619c/pytest_mock-3.15.1-py3-none-any.whl", hash = "sha256:0a25e2eb88fe5168d535041d09a4529a188176ae608a6d249ee65abc0949630d", size = 10095, upload-time = "2025-09-16T16:37:25.734Z" },
+    { url = "https://files.pythonhosted.org/packages/db/5b/b83a9bf1a3b4ec222f9fa083147ff6816245223da0ab92370e7e056f113f/pytest_mock-3.16.0-py3-none-any.whl", hash = "sha256:007cfeb257801d88d9c0b2a7b5a15a15e73b71968dfd72e7bf8c4a2f8393aec8", size = 10016, upload-time = "2026-09-27T14:57:54.283Z" },
 ]
 
 [[package]]
@@ -696,7 +696,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "charmed-hpc-libs", extras = ["ops"], specifier = "~=0.7" },
+    { name = "charmed-hpc-libs", extras = ["ops"], specifier = "~=0.8" },
     { name = "charmed-openssh-ssh-config-interface", specifier = "~=0.1" },
     { name = "charmlibs-interfaces-certificate-transfer", specifier = "~=1.0" },
     { name = "charmlibs-interfaces-ldap", specifier = "~=1.1" },
@@ -709,8 +709,8 @@ requires-dist = [
     { name = "pyfakefs", marker = "extra == 'dev'", specifier = "~=6.2" },
     { name = "pyright", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "~=9.1" },
-    { name = "pytest-jubilant-bdd", marker = "extra == 'dev'", specifier = "~=0.14" },
-    { name = "pytest-mock", marker = "extra == 'dev'", specifier = "~=3.15" },
+    { name = "pytest-jubilant-bdd", marker = "extra == 'dev'", specifier = "~=0.17" },
+    { name = "pytest-mock", marker = "extra == 'dev'", specifier = "~=3.16" },
     { name = "pytest-order", marker = "extra == 'dev'", specifier = "~=1.5" },
     { name = "ruff", marker = "extra == 'dev'" },
 ]
