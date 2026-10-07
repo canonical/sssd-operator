@@ -177,7 +177,7 @@ just generate-charmhub-token  # Export a Charmhub release token to .charmhub.sec
 ```bash
 just check           # Run static checks (lint, typecheck).
 just unit            # Run unit tests with a coverage report.
-just integration     # Validate + generate Gherkin features, then run integration tests.
+just integration     # Run integration tests.
 just test            # Run all test suites (unit + integration).
 just test <target>   # Run a specific test target.
 just fmt             # Format with ruff and apply auto-fixes.
