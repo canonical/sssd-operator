@@ -104,14 +104,21 @@ class SSSDConfigManager:
         domain_config = {
             "id_provider": "ldap",
             "auth_provider": "ldap",
+            "access_provider": "ldap",
+            "chpass_provider": "ldap",
             "ldap_uri": ",".join(data.ldaps_urls if data.ldaps_enabled else data.urls),
             "ldap_search_base": data.base_dn,
+            "ldap_user_search_base": f"ou=users,{data.base_dn}",
+            "ldap_group_search_base": data.base_dn,
             "ldap_default_bind_dn": data.bind_dn,
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": data.bind_password,
-            "ldap_use_tokengroups": "False",
             "ldap_group_member": "member",
             "ldap_schema": "rfc2307bis",
+            "ldap_user_object_class": "user",
+            "ldap_user_name": "cn",
+            "ldap_group_object_class": "group",
+            "ldap_group_name": "cn",
             "ldap_id_use_start_tls": "True"
             if data.starttls and not data.ldaps_enabled
             else "False",
