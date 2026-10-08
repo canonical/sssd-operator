@@ -40,14 +40,21 @@ domains = ldap
 [domain/ldap]
 id_provider = ldap
 auth_provider = ldap
+access_provider = ldap
+chpass_provider = ldap
 ldap_uri = ldap://10.0.0.135:3893
-ldap_search_base = dc=glauth,dc=com
-ldap_default_bind_dn = cn=sssd,ou=sssd,dc=glauth,dc=com
+ldap_search_base = dc=authentik,dc=com
+ldap_user_search_base = ou=users,dc=authentik,dc=com
+ldap_group_search_base = dc=authentik,dc=com
+ldap_default_bind_dn = cn=sssd,ou=sssd,dc=authentik,dc=com
 ldap_default_authtok_type = password
 ldap_default_authtok = 73402cd1453bdb98e8456aca6e858a48621dd3e716fbf7a5be6fa01d2fc8c944
-ldap_use_tokengroups = False
 ldap_group_member = member
 ldap_schema = rfc2307bis
+ldap_user_object_class = user
+ldap_user_name = cn
+ldap_group_object_class = group
+ldap_group_name = cn
 ldap_id_use_start_tls = True
 cache_credentials = True
 """
@@ -144,9 +151,9 @@ class TestSSSDConfigmanager:
         ldap_data = LdapProviderData(
             urls=["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"],
             ldaps_urls=[],
-            base_dn="dc=glauth,dc=com",
+            base_dn="dc=authentik,dc=com",
             starttls=False,
-            bind_dn="cn=sssd,ou=sssd,dc=glauth,dc=com",
+            bind_dn="cn=sssd,ou=sssd,dc=authentik,dc=com",
             bind_password="supersecret",
             auth_method="simple",
         )
@@ -157,14 +164,21 @@ class TestSSSDConfigmanager:
         assert dict(config["domain/ldap"]) == {
             "id_provider": "ldap",
             "auth_provider": "ldap",
+            "access_provider": "ldap",
+            "chpass_provider": "ldap",
             "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
-            "ldap_search_base": "dc=glauth,dc=com",
-            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=glauth,dc=com",
+            "ldap_search_base": "dc=authentik,dc=com",
+            "ldap_user_search_base": "ou=users,dc=authentik,dc=com",
+            "ldap_group_search_base": "dc=authentik,dc=com",
+            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=authentik,dc=com",
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": "supersecret",
-            "ldap_use_tokengroups": "False",
             "ldap_group_member": "member",
             "ldap_schema": "rfc2307bis",
+            "ldap_user_object_class": "user",
+            "ldap_user_name": "cn",
+            "ldap_group_object_class": "group",
+            "ldap_group_name": "cn",
             "ldap_id_use_start_tls": "False",
             "cache_credentials": "True",
         }
@@ -178,9 +192,9 @@ class TestSSSDConfigmanager:
         ldap_data_ldaps = LdapProviderData(
             urls=["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"],
             ldaps_urls=["ldaps://10.0.0.128:636", "ldaps://10.0.0.129:636"],
-            base_dn="dc=glauth,dc=com",
+            base_dn="dc=authentik,dc=com",
             starttls=True,
-            bind_dn="cn=sssd,ou=sssd,dc=glauth,dc=com",
+            bind_dn="cn=sssd,ou=sssd,dc=authentik,dc=com",
             bind_password="supersecret",
             auth_method="simple",
         )
@@ -189,14 +203,21 @@ class TestSSSDConfigmanager:
         assert dict(config["domain/ldap"]) == {
             "id_provider": "ldap",
             "auth_provider": "ldap",
+            "access_provider": "ldap",
+            "chpass_provider": "ldap",
             "ldap_uri": "ldaps://10.0.0.128:636,ldaps://10.0.0.129:636",
-            "ldap_search_base": "dc=glauth,dc=com",
-            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=glauth,dc=com",
+            "ldap_search_base": "dc=authentik,dc=com",
+            "ldap_user_search_base": "ou=users,dc=authentik,dc=com",
+            "ldap_group_search_base": "dc=authentik,dc=com",
+            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=authentik,dc=com",
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": "supersecret",
-            "ldap_use_tokengroups": "False",
             "ldap_group_member": "member",
             "ldap_schema": "rfc2307bis",
+            "ldap_user_object_class": "user",
+            "ldap_user_name": "cn",
+            "ldap_group_object_class": "group",
+            "ldap_group_name": "cn",
             "ldap_id_use_start_tls": "False",
             "cache_credentials": "True",
         }
@@ -211,14 +232,21 @@ class TestSSSDConfigmanager:
         assert dict(config["domain/polaris"]) == {
             "id_provider": "ldap",
             "auth_provider": "ldap",
+            "access_provider": "ldap",
+            "chpass_provider": "ldap",
             "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
-            "ldap_search_base": "dc=glauth,dc=com",
-            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=glauth,dc=com",
+            "ldap_search_base": "dc=authentik,dc=com",
+            "ldap_user_search_base": "ou=users,dc=authentik,dc=com",
+            "ldap_group_search_base": "dc=authentik,dc=com",
+            "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=authentik,dc=com",
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": "supersecret",
-            "ldap_use_tokengroups": "False",
             "ldap_group_member": "member",
             "ldap_schema": "rfc2307bis",
+            "ldap_user_object_class": "user",
+            "ldap_user_name": "cn",
+            "ldap_group_object_class": "group",
+            "ldap_group_name": "cn",
             "ldap_id_use_start_tls": "False",
             "cache_credentials": "True",
         }
@@ -244,9 +272,9 @@ class TestSSSDConfigmanager:
         ldap_data = LdapProviderData(
             urls=["ldap://10.0.0.128:3893", "ldap://10.0.0.129:3893"],
             ldaps_urls=[],
-            base_dn="dc=glauth,dc=com",
+            base_dn="dc=authentik,dc=com",
             starttls=True,
-            bind_dn="cn=sssd,ou=sssd,dc=glauth,dc=com",
+            bind_dn="cn=sssd,ou=sssd,dc=authentik,dc=com",
             bind_password="supersecret",
             auth_method="simple",
         )

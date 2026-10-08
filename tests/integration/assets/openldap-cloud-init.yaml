@@ -15,21 +15,30 @@ write_files:
     slapd slapd/password2 password secret
     slapd slapd/purge_database boolean true
     slapd slapd/move_old_database boolean false
+- path: /root/schema.ldif
+  permissions: '0644'
+  content: |
+    dn: cn=authentik,cn=schema,cn=config
+    objectClass: olcSchemaConfig
+    cn: authentik
+    olcObjectClasses: ( 1.3.6.1.4.1.99999.1.1 NAME 'user' DESC 'Authentik-style user' SUP top AUXILIARY MAY ( uid $ uidNumber $ gidNumber $ loginShell $ homeDirectory $ mail $ sn $ givenName $ userPassword ) )
+    olcObjectClasses: ( 1.3.6.1.4.1.99999.2.1 NAME 'group' DESC 'Authentik-style group' SUP top AUXILIARY MAY ( gidNumber $ member $ memberUid $ description ) )
 - path: /root/init.ldif
   permissions: '0644'
   content: |
-    dn: ou=People,dc=test,dc=ubuntu,dc=com
+    dn: ou=users,dc=test,dc=ubuntu,dc=com
     objectClass: organizationalUnit
-    ou: People
+    ou: users
 
-    dn: ou=Groups,dc=test,dc=ubuntu,dc=com
+    dn: ou=groups,dc=test,dc=ubuntu,dc=com
     objectClass: organizationalUnit
-    ou: Groups
+    ou: groups
 
-    dn: uid=nucci,ou=People,dc=test,dc=ubuntu,dc=com
+    dn: cn=nucci,ou=users,dc=test,dc=ubuntu,dc=com
     uid: nucci
     objectClass: inetOrgPerson
     objectClass: posixAccount
+    objectClass: user
     cn: nucci
     sn: nucci
     givenName: nucci
@@ -40,10 +49,11 @@ write_files:
     loginShell: /bin/bash
     homeDirectory: /home/nucci
 
-    dn: uid=bigfoot,ou=People,dc=test,dc=ubuntu,dc=com
+    dn: cn=bigfoot,ou=users,dc=test,dc=ubuntu,dc=com
     uid: bigfoot
     objectClass: inetOrgPerson
     objectClass: posixAccount
+    objectClass: user
     cn: bigfoot
     sn: bigfoot
     givenName: bigfoot
@@ -54,23 +64,26 @@ write_files:
     loginShell: /bin/bash
     homeDirectory: /home/bigfoot
 
-    dn: cn=nucci,ou=Groups,dc=test,dc=ubuntu,dc=com
+    dn: cn=nucci,ou=groups,dc=test,dc=ubuntu,dc=com
     cn: nucci
     objectClass: posixGroup
+    objectClass: group
     gidNumber: 10000
-    memberUid: nucci
+    member: cn=nucci,ou=users,dc=test,dc=ubuntu,dc=com
 
-    dn: cn=bigfoot,ou=Groups,dc=test,dc=ubuntu,dc=com
+    dn: cn=bigfoot,ou=groups,dc=test,dc=ubuntu,dc=com
     cn: bigfoot
     objectClass: posixGroup
+    objectClass: group
     gidNumber: 10001
-    memberUid: bigfoot
+    member: cn=bigfoot,ou=users,dc=test,dc=ubuntu,dc=com
 
-    dn: cn=research,ou=Groups,dc=test,dc=ubuntu,dc=com
+    dn: cn=research,ou=groups,dc=test,dc=ubuntu,dc=com
     cn: research
     objectClass: posixGroup
+    objectClass: group
     gidNumber: 10100
-    memberUid: nucci
+    member: cn=nucci,ou=users,dc=test,dc=ubuntu,dc=com
 - path: /root/enable-tls.ldif
   permissions: '0644'
   content: |
@@ -117,6 +130,7 @@ write_files:
 postruncmd:
 - debconf-set-selections < /root/server.conf
 - dpkg-reconfigure -f noninteractive slapd
+- ldapadd -Y EXTERNAL -H ldapi:/// -f /root/schema.ldif
 - ldapadd -x -D 'cn=admin,dc=test,dc=ubuntu,dc=com' -w secret -f /root/init.ldif -H 'ldap:///'
 - openssl genrsa -out /etc/ssl/private/ca.key 4096
 - openssl req -x509 -new -nodes -key /etc/ssl/private/ca.key -sha256 -days 3650 -subj '/CN=Test CA' -out /etc/ldap/sasl2/ca.crt
