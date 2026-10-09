@@ -46,7 +46,7 @@ chpass_provider = ldap
 ldap_uri = ldap://10.0.0.135:3893
 ldap_search_base = dc=authentik,dc=com
 ldap_user_search_base = ou=users,dc=authentik,dc=com
-ldap_group_search_base = dc=authentik,dc=com
+ldap_group_search_base = ou=groups,dc=authentik,dc=com
 ldap_default_bind_dn = cn=sssd,ou=sssd,dc=authentik,dc=com
 ldap_default_authtok_type = password
 ldap_default_authtok = 73402cd1453bdb98e8456aca6e858a48621dd3e716fbf7a5be6fa01d2fc8c944
@@ -171,7 +171,7 @@ class TestSSSDConfigmanager:
             "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
             "ldap_search_base": "dc=authentik,dc=com",
             "ldap_user_search_base": "ou=users,dc=authentik,dc=com",
-            "ldap_group_search_base": "dc=authentik,dc=com",
+            "ldap_group_search_base": "ou=groups,dc=authentik,dc=com",
             "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=authentik,dc=com",
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": "supersecret",
@@ -211,7 +211,7 @@ class TestSSSDConfigmanager:
             "ldap_uri": "ldaps://10.0.0.128:636,ldaps://10.0.0.129:636",
             "ldap_search_base": "dc=authentik,dc=com",
             "ldap_user_search_base": "ou=users,dc=authentik,dc=com",
-            "ldap_group_search_base": "dc=authentik,dc=com",
+            "ldap_group_search_base": "ou=groups,dc=authentik,dc=com",
             "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=authentik,dc=com",
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": "supersecret",
@@ -241,7 +241,7 @@ class TestSSSDConfigmanager:
             "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
             "ldap_search_base": "dc=authentik,dc=com",
             "ldap_user_search_base": "ou=users,dc=authentik,dc=com",
-            "ldap_group_search_base": "dc=authentik,dc=com",
+            "ldap_group_search_base": "ou=groups,dc=authentik,dc=com",
             "ldap_default_bind_dn": "cn=sssd,ou=sssd,dc=authentik,dc=com",
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": "supersecret",
