@@ -110,7 +110,7 @@ class SSSDConfigManager:
             "ldap_access_filter": "(objectClass=user)",
             "ldap_search_base": data.base_dn,
             "ldap_user_search_base": f"ou=users,{data.base_dn}",
-            "ldap_group_search_base": data.base_dn,
+            "ldap_group_search_base": f"ou=groups,{data.base_dn}",
             "ldap_default_bind_dn": data.bind_dn,
             "ldap_default_authtok_type": "password",
             "ldap_default_authtok": data.bind_password,
