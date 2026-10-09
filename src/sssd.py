@@ -105,7 +105,7 @@ class SSSDConfigManager:
             "id_provider": "ldap",
             "auth_provider": "ldap",
             "access_provider": "ldap",
-            "chpass_provider": "ldap",
+            "chpass_provider": "none",
             "ldap_uri": ",".join(data.ldaps_urls if data.ldaps_enabled else data.urls),
             "ldap_access_filter": "(objectClass=user)",
             "ldap_search_base": data.base_dn,
