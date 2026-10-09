@@ -41,6 +41,7 @@ domains = ldap
 id_provider = ldap
 auth_provider = ldap
 access_provider = ldap
+ldap_access_filter = (objectClass=user)
 chpass_provider = ldap
 ldap_uri = ldap://10.0.0.135:3893
 ldap_search_base = dc=authentik,dc=com
@@ -165,6 +166,7 @@ class TestSSSDConfigmanager:
             "id_provider": "ldap",
             "auth_provider": "ldap",
             "access_provider": "ldap",
+            "ldap_access_filter": "(objectClass=user)",
             "chpass_provider": "ldap",
             "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
             "ldap_search_base": "dc=authentik,dc=com",
@@ -204,6 +206,7 @@ class TestSSSDConfigmanager:
             "id_provider": "ldap",
             "auth_provider": "ldap",
             "access_provider": "ldap",
+            "ldap_access_filter": "(objectClass=user)",
             "chpass_provider": "ldap",
             "ldap_uri": "ldaps://10.0.0.128:636,ldaps://10.0.0.129:636",
             "ldap_search_base": "dc=authentik,dc=com",
@@ -233,6 +236,7 @@ class TestSSSDConfigmanager:
             "id_provider": "ldap",
             "auth_provider": "ldap",
             "access_provider": "ldap",
+            "ldap_access_filter": "(objectClass=user)",
             "chpass_provider": "ldap",
             "ldap_uri": "ldap://10.0.0.128:3893,ldap://10.0.0.129:3893",
             "ldap_search_base": "dc=authentik,dc=com",
