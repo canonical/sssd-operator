@@ -100,6 +100,16 @@ class SSSDConfigManager:
         elif name not in domains:  # There are existing domains, but this domain is new.
             domains.append(name)
 
+        # FIXME: https://github.com/canonical/charmlibs/issues/741
+        #   This domain configuration currently only works with:
+        #
+        #     1. The `authentik-ldap-outpost` charm.
+        #     2. Any external LDAP server that uses the same directory layout as Authentik.
+        #
+        #   This block of code will need to be updated once #741 is resolved so that the
+        #   additional fields here can be properly configured for generic LDAP servers that are
+        #   either complaint or non-compliant with RFC2307* rather than have the SSSD operator
+        #   tightly scoped to Authentik's directory layout.
         domain_name = f"domain/{name}"
         domain_config = {
             "id_provider": "ldap",
