@@ -42,7 +42,7 @@ id_provider = ldap
 auth_provider = ldap
 access_provider = ldap
 ldap_access_filter = (objectClass=user)
-chpass_provider = ldap
+chpass_provider = none
 ldap_uri = ldap://10.0.0.135:3893
 ldap_search_base = dc=authentik,dc=com
 ldap_user_search_base = ou=users,dc=authentik,dc=com
