@@ -22,7 +22,7 @@ dependencies = [
     "pydantic>=2.14.0",
     "charmed-hpc-libs[ops] ~= 0.8",
     "charmed-openssh-ssh-config-interface ~= 0.1",
-    "charmlibs-interfaces-certificate-transfer ~= 1.0",
+    "charmlibs-interfaces-certificate-transfer ~= 1.1",
     "charmlibs-interfaces-ldap ~= 1.1",
 ]
 
