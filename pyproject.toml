@@ -33,7 +33,7 @@ dev = [
     "ops[testing] ~= 3.9",
     "pyfakefs ~= 6.2",
     "pytest ~= 9.1",
-    "pytest-mock ~= 3.16",
+    "pytest-mock ~= 3.17",
     "pytest-order ~= 1.5",
     "pytest-jubilant-bdd ~= 0.18",
 
