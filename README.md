@@ -5,7 +5,7 @@
 ![GitHub License](https://img.shields.io/github/license/canonical/sssd-operator)
 [![Matrix](https://img.shields.io/matrix/ubuntu-hpc%3Amatrix.org?logo=matrix&label=ubuntu-hpc)](https://matrix.to/#/#hpc:ubuntu.com)
 
-A [Juju](https://juju.is) charm for automating the full lifecycle operations of
+A [Juju](https://canonical.com/juju) charm for automating the full lifecycle operations of
 [SSSD](https://sssd.io) (System Security Services Daemon), a system service to access
 remote directories and authentication mechanisms such as LDAP, Kerberos, or FreeIPA.
 
@@ -15,15 +15,35 @@ To deploy the SSSD operator, you'll need to integrate it with a principal charm:
 
 ```shell
 juju deploy ubuntu --base ubuntu@26.04
-juju deploy sssd --channel edge
+juju deploy sssd --channel latest/edge
 juju integrate sssd ubuntu
 ```
 
-The SSSD operator can integrate with the [glauth-k8s-operator](https://github.com/canonical/glauth-k8s-operator) over the `ldap` integration. If the glauth-k8s operator is deployed properly, then the principal charm SSSD is integrated with will be provided LDAP services by GLAuth:
+The SSSD operator is the client side of the identity provider component for a [Charmed HPC](https://ubuntu.com/hpc/docs)
+cluster. Integrated with a principal charm, it enrolls that machine with a remote 
+LDAP directory so that your cluster's users can log into the machine with their LDAP credentials.
+The operator supports the following integrations:
 
-```shell
-juju integrate glauth-k8s:ldap sssd:ldap
-```
+- `ldap`: receive LDAP configuration data from an identity provider. The recommended
+  identity provider for Charmed HPC clusters is
+  [Authentik](https://github.com/canonical/authentik-ldap-outpost-operator), whose
+  LDAP outpost serves the LDAP directory that SSSD enrolls your machines with.
+- `receive-ca-cert`: receive the CA certificate that signs the identity provider's
+  TLS certificate. This integration is needed with Charmed Authentik because it serves
+  LDAPS (TLS-encrypted LDAP) by default.
+- `ssh-config`: provide SSH daemon configuration to charmed operators such as
+  [OpenSSH](https://charmhub.io/openssh) to enable SSH key-based authentication for
+  your cluster's users.
+
+Deploying a working Authentik deployment is more involved than deploying a single
+charm, so refer to the
+[Deploy an identity provider](https://ubuntu.com/hpc/docs/latest/howto/deploy/deploy-identity-provider/)
+how-to in the Charmed HPC documentation for complete instructions on deploying
+Authentik, integrating it with SSSD, and enabling SSH key-based authentication. Once
+deployed, refer to the
+[Manage users and groups](https://ubuntu.com/hpc/docs/latest/howto/manage/manage-users-and-groups/)
+how-to for instructions on managing your cluster's users and groups with the Authentik
+Terraform provider, including setting users' default login shells and public SSH keys.
 
 ## 🤔 What's next?
 
@@ -31,7 +51,7 @@ If you want to learn more about all the things you can do with the SSSD operator
 or have any further questions on what you can do with the operator, here are some
 further resources for you to explore:
 
-* [Charmed HPC documentation](https://documentation.ubuntu.com/charmed-hpc)
+* [Charmed HPC documentation](https://ubuntu.com/hpc/docs/latest)
 * [Open an issue](https://github.com/canonical/sssd-operator/issues/new?title=ISSUE+TITLE&body=*Please+describe+your+issue*)
 * [Ask a question](https://discourse.ubuntu.com/c/project/hpc/151)
 
