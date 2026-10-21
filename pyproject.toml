@@ -41,6 +41,12 @@ dev = [
     "ruff",
     "codespell",
     "pyright",
+
+    # TiCS scan dependencies
+    "flake8",
+    "pylint",
+    "pytest",
+    "pyyaml",
 ]
 
 # Testing tools configuration
@@ -56,7 +62,7 @@ log_cli_level = "INFO"
 
 # Spell checking tools configuration
 [tool.codespell]
-skip = "build,venv,.venv,icon.svg,.git,.mypy_cache,.ruff_cache,.vscode,.coverage"
+skip = "build,venv,.venv,icon.svg,.git,.mypy_cache,.ruff_cache,.vscode,.coverage,uv.lock"
 
 # Formatting tools configuration
 [tool.black]
