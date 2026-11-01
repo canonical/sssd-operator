@@ -24,10 +24,13 @@ jobs:
     uses: ./.github/workflows/ci.yaml
 
   release-to-charmhub:
-    name: Release to CharmHub
+    name: Release to CharmHub (${{ matrix.architecture }})
     needs:
       - ci-tests
-    runs-on: ubuntu-26.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.ci-tests.outputs.matrix) }}
+    runs-on: ${{ matrix.machine-type }}
     permissions:
       contents: write
     steps:
