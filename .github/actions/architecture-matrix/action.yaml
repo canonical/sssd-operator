@@ -1,0 +1,48 @@
+# Copyright 2026 Canonical Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Charmcraft architecture matrix
+description: >-
+  Map the architectures supported by the charm
+  to GitHub runner labels
+
+inputs:
+  charmcraft-file:
+    description: Path to the Charmcraft project file
+    required: false
+    default: charmcraft.yaml
+  runners:
+    description: JSON object mapping architecture names to GitHub runner labels
+    required: false
+    default: >-
+      {"amd64":"ubuntu-26.04","arm64":"ubuntu-26.04-arm"}
+
+outputs:
+  matrix:
+    description: JSON matrix object with architecture and machine-type entries
+    value: ${{ steps.matrix.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install uv
+      shell: bash
+      run: sudo snap install astral-uv --classic
+
+    - id: matrix
+      shell: bash
+      env:
+        CHARMCRAFT_FILE: ${{ inputs.charmcraft-file }}
+        RUNNERS_JSON: ${{ inputs.runners }}
+      run: uv run "${{ github.action_path }}/main.py"

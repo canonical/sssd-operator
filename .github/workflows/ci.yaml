@@ -16,6 +16,10 @@ name: CI
 
 on:
   workflow_call:
+    outputs:
+      matrix:
+        description: Architecture and runner matrix for dependent jobs
+        value: ${{ jobs.prepare-integration.outputs.matrix }}
   pull_request:
 
 jobs:
@@ -35,12 +39,27 @@ jobs:
         run: sudo snap install astral-uv --classic
       - run: just unit
 
-  integration-test:
-    name: Integration tests (LXD)
+  prepare-integration:
+    name: Prepare integration matrix
     runs-on: ubuntu-26.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: matrix
+        uses: ./.github/actions/architecture-matrix
+
+  integration-tests:
+    name: Integration tests (${{ matrix.machine-type }})
+    strategy:
+      fail-fast: false
+      matrix: >-
+        ${{ fromJSON(needs.prepare-integration.outputs.matrix) }}
     needs:
       - ci
       - unit-test
+      - prepare-integration
+    runs-on: ${{ matrix.machine-type }}
     steps:
       - uses: actions/checkout@v7
       - uses: canonical/hpc-team/.github/actions/setup-just@main
@@ -53,5 +72,5 @@ jobs:
         with:
           provider: lxd
           lxd-channel: 5.21/stable
-          juju-channel: 3.6/edge
+          juju-channel: 3.6/stable
       - run: just integration
