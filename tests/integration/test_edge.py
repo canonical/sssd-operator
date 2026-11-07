@@ -14,6 +14,8 @@
 
 """BDD step definitions for SSSD lifecycle tests."""
 
+import platform
+
 import jubilant
 from pytest_bdd import given, parsers, scenarios, then
 from pytest_jubilant_bdd import Context
@@ -27,6 +29,21 @@ from constants import (
 )
 
 scenarios(*EDGE_FEATURES)
+
+
+@given(parsers.parse("I store the host architecture as '{name}'"))
+def store_host_architecture(context: Context, name: str) -> None:
+    """Store the host architecture in the scenario state under `name`.
+
+    The host architecture matches the Juju controller's architecture, since
+    the controller is bootstrapped on LXD on the same machine that runs
+    pytest. The machine value is normalized to lowercase with underscores
+    replaced by hyphens before mapping to Juju architecture names; values
+    that already match a Juju architecture pass through unchanged.
+    """
+    machine = platform.machine().lower().replace("_", "-")
+    arch = {"x86-64": "amd64", "aarch64": "arm64"}.get(machine, machine)
+    context.scenario_state[name] = arch
 
 
 @given("I configure 'ldap-integrator' with data from 'openldap'")
