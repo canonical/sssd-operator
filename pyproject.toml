@@ -35,7 +35,7 @@ dev = [
     # pytest 9.2 removed `FixtureManager._arg2fixturedefs`, which pytest-bdd
     # 8.x (required by pytest-jubilant-bdd ~= 0.20) still accesses. Relax to
     # `~= 9.2` once pytest-jubilant-bdd allows pytest-bdd >= 9.
-    "pytest ~= 9.1.0",
+    "pytest ~= 9.2.0",
     "pytest-mock ~= 3.17",
     "pytest-order ~= 1.5",
     "pytest-jubilant-bdd ~= 0.20",
