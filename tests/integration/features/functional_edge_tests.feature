@@ -31,6 +31,11 @@ Feature: Functional edge tests
     And 'sssd' is integrated with 'ldap-integrator'
     When I execute 'getent passwd nucci' on unit 'sssd/0'
     Then the output should be 'nucci:*:10000:10000:nucci:/home/nucci:/bin/bash'
+  Scenario: Access a remote group
+    Given 'sssd' is deployed
+    And 'sssd' is integrated with 'ldap-integrator'
+    When I execute 'getent group research' on unit 'sssd/0'
+    Then the output should be 'research:*:10100:nucci'
   Scenario: Disintegrate SSSD with an LDAP server
     Given 'sssd' is deployed
     And 'ldap-integrator' is deployed
